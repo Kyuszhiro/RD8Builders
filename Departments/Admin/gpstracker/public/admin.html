@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <style>
+    html, body { height: 100%; margin: 0; }
+    #map { height: 100%; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script>
+    const map = L.map('map').setView([13.41, 122.56], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    const socket = io();
+    const markers = {};
+
+    socket.on('locations', (allLocations) => {
+      console.log("Received locations:", allLocations); // ✅ Log all data
+      for (const id in allLocations) {
+        const user = allLocations[id];
+        const pos = [user.lat, user.lng];
+
+        if (!markers[id]) {
+          markers[id] = L.marker(pos).addTo(map).bindPopup(user.name);
+        } else {
+          markers[id].setLatLng(pos).setPopupContent(user.name);
+        }
+      }
+
+      // Remove disconnected users
+      for (const id in markers) {
+        if (!allLocations[id]) {
+          map.removeLayer(markers[id]);
+          delete markers[id];
+        }
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Car Panel - RD8 BUILDERS</title>
+  <style>
+    /* All original styles preserved */
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f4;
+    }
+
+    main {
+      flex: 1;
+    }
+
+    header {
+      background-color: #2c3e50;
+    }
+
+    .footer {
+      background-color: #2c3e50;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      margin-top: auto;
+    }
+
+    nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px;
+      position: relative;
+    }
+
+    .logo {
+      color: white;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    .menu-toggle span {
+      height: 3px;
+      width: 25px;
+      background: white;
+      border-radius: 2px;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .nav-item, .nav-item-button {
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      padding: 10px 15px;
+      background: none;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .nav-item:hover, .nav-item-button:hover {
+      background-color: white;
+      color: #2c3e50;
+    }
+
+    .driver-container {
+      max-width: 800px;
+      margin: 5px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .driver {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      flex-wrap: wrap;
+    }
+
+    .driver:last-child {
+      border-bottom: none;
+    }
+
+    .driver-name {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      font-size: 30px;
+      margin-top: 20px;
+    }
+
+    .status-indicator {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: bold;
+      margin-right: 10px;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-width: 100px;
+    }
+
+    .available { background-color: #27ae60; color: white; }
+    .ontrip { background-color: #e67e22; color: white; }
+    .timedout { background-color: #7f8c8d; color: white; }
+    .dayoff { background-color: #00b7ff; color: white; }
+    .absent { background-color: #ff0000; color: white; }
+
+    .dropdown { position: relative; }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background-color: white;
+      min-width: 120px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      z-index: 100;
+    }
+
+    .dropdown-content button {
+      display: block;
+      width: 100%;
+      padding: 8px 12px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .dropdown-content button:hover {
+      background-color: #f0f0f0;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .log-section {
+      max-width: 800px;
+      margin: 20px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .report-item {
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #444;
+    }
+
+    .datetime {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    @media (max-width: 768px) {
+      .menu-toggle { display: flex; }
+      .nav-links { display: none; flex-direction: column; width: 100%; background-color: #2c3e50; margin-top: 10px; padding: 10px 0; }
+      .nav-links.show { display: flex; }
+      .nav-item { width: 100%; text-align: left; padding: 10px 20px; }
+      .driver { flex-direction: column; align-items: flex-start; gap: 10px; }
+    }
+
+    .back-button {
+      display: block;
+      margin: 10px 20px 0;
+      text-align: left;
+      background-color: #2c3e50;
+      color: white;
+      padding: 10px 25px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      text-decoration: none;
+      width: fit-content;
+    }
+
+    .back-button:hover {
+      background-color: #34495e;
+    }
+
+    /* Password Modal */
+    #csvPasswordModal, #clearPasswordModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      width: 300px;
+    }
+
+    .modal-content input {
+      margin: 10px 0;
+      padding: 8px;
+      width: 90%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .modal-content button {
+      padding: 8px 16px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .confirm {
+      background-color: #27ae60;
+      color: white;
+    }
+
+    .cancel {
+      background-color: #c0392b;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <nav>
+      <div class="logo">RD8 BUILDERS</div>
+      <div class="menu-toggle" id="menu-toggle">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="nav-links" id="nav-links">
+        <a href="../../Index.html" class="nav-item">Home</a>
+        <a href="../../AboutUs.html" class="nav-item">About Us</a>
+        <a href="../../CompanyProfile.html" class="nav-item">Company Profile</a> <!-- Always accessible -->
+        <a href="../../ContactUs.html" class="nav-item">Contact Us</a>
+        <a href="#" class="nav-item" id="authLink">Login</a>
+      </div>
+    </nav>
+  </header>
+
+  <a class="back-button" href="admin.html">← Back to Admin</a>
+  <div class="datetime" id="current-date-time" style="font-weight: bold;"></div>
+  <br>
+  <h1>CAR STATUS</h1>
+
+  <div class="driver-container">
+    <div class="driver">
+      <div class="driver-name">Jaren Talampas</div>
+      <div class="status-indicator">No Status</div>
+      <div class="dropdown">
+        <button>Set Status ▾</button>
+        <div class="dropdown-content">
+        <button onclick="setStatus(this, 'Jaren Talampas', 'On Duty', 'available')">On Duty</button>
+        <button onclick="setStatus(this, 'Jaren Talampas', 'Ready', 'ontrip')">Ready</button>
+        <button onclick="setStatus(this, 'Jaren Talampas', 'Timed Out', 'timedout')">Timed Out</button>
+        <button onclick="setStatus(this, 'Jaren Talampas', 'Day Off', 'dayoff')">Day Off</button>
+        <button onclick="setStatus(this, 'Jaren Talampas', 'Absent', 'absent')">Absent</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <div class="driver-container">
+    <div class="driver">
+      <div class="driver-name">Rannie Castro</div>
+      <div class="status-indicator">No Status</div>
+      <div class="dropdown">
+        <button>Set Status ▾</button>
+        <div class="dropdown-content">
+        <button onclick="setStatus(this, 'Rannie Castro', 'On Duty', 'available')">On Duty</button>
+        <button onclick="setStatus(this, 'Rannie Castro', 'Ready', 'ontrip')">Ready</button>
+        <button onclick="setStatus(this, 'Rannie Castro', 'Timed Out', 'timedout')">Timed Out</button>
+        <button onclick="setStatus(this, 'Rannie Castro', 'Day Off', 'dayoff')">Day Off</button>
+        <button onclick="setStatus(this, 'Rannie Castro', 'Absent', 'absent')">Absent</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <div class="driver-container">
+    <div class="driver">
+      <div class="driver-name">Ian Paguio</div>
+      <div class="status-indicator">No Status</div>
+      <div class="dropdown">
+        <button>Set Status ▾</button>
+        <div class="dropdown-content">
+        <button onclick="setStatus(this, 'Ian Paguio', 'On Duty', 'available')">On Duty</button>
+        <button onclick="setStatus(this, 'Ian Paguio', 'Ready', 'ontrip')">Ready</button>
+        <button onclick="setStatus(this, 'Ian Paguio', 'Timed Out', 'timedout')">Timed Out</button>
+        <button onclick="setStatus(this, 'Ian Paguio', 'Day Off', 'dayoff')">Day Off</button>
+        <button onclick="setStatus(this, 'Ian Paguio', 'Absent', 'absent')">Absent</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="log-section">
+    <h3>Recent Status Updates</h3>
+    <input type="text" id="log-search" placeholder="Search by name or date..." style="margin-bottom: 15px; padding: 8px; width: 100%; border: 1px solid #ccc; border-radius: 5px;" />
+    <button onclick="clearStatusReport()" style="margin: 10px 5px 10px 0; padding: 10px 15px; background-color: #c0392b; color: white; border: none; border-radius: 5px; cursor: pointer;">Clear Status Report</button>
+    <button onclick="downloadCSV()" style="margin: 10px 0; padding: 10px 15px; background-color: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer;">Download CSV</button>
+    <div id="report-log"></div>
+  </div>
+
+  <!-- CSV Password Modal -->
+  <div id="csvPasswordModal">
+    <div class="modal-content">
+      <h3>Enter Admin Password</h3>
+      <input type="password" id="csvPasswordInput" placeholder="Password" />
+      <div>
+        <button class="confirm" onclick="confirmCSVDownload()">Download</button>
+        <button class="cancel" onclick="closeCSVModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clear Status Password Modal -->
+  <div id="clearPasswordModal">
+    <div class="modal-content">
+      <h3>Enter Admin Password</h3>
+      <input type="password" id="clearPasswordInput" placeholder="Password" />
+      <div>
+        <button class="confirm" onclick="confirmClearStatus()">Clear</button>
+        <button class="cancel" onclick="closeClearModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const drivers = ["Jaren Talampas", "Rannie Castro", "Ian Paguio"];
+    const logKey = "Driver_logs";
+    const statusPrefix = "Driver_status_";
+
+    function updateDateTime() {
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const time = now.toLocaleTimeString();
+      const formattedDate = now.toLocaleDateString(undefined, options);
+      document.getElementById('current-date-time').textContent = `${formattedDate} | ${time}`;
+    }
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+
+    const savedLogs = JSON.parse(localStorage.getItem(logKey)) || [];
+    const logContainer = document.getElementById("report-log");
+    let allLogs = [...savedLogs].reverse();
+
+    function displayLogs(logs) {
+      logContainer.innerHTML = "";
+      logs.forEach(log => {
+        const div = document.createElement("div");
+        div.classList.add("report-item");
+        div.textContent = log;
+        logContainer.appendChild(div);
+      });
+    }
+
+    displayLogs(allLogs);
+
+    document.getElementById("log-search").addEventListener("input", function () {
+      const keyword = this.value.toLowerCase();
+      const filtered = allLogs.filter(log => log.toLowerCase().includes(keyword));
+      displayLogs(filtered);
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      drivers.forEach(driver => {
+        const status = localStorage.getItem(`${statusPrefix}${driver}`);
+        const element = Array.from(document.querySelectorAll('.driver')).find(el =>
+          el.querySelector('.driver-name').textContent.includes(driver)
+        );
+        if (element && status) {
+          const [statusText, statusClass] = status.split('|');
+          const statusSpan = element.querySelector('.status-indicator');
+          statusSpan.className = 'status-indicator ' + statusClass;
+          statusSpan.textContent = statusText;
+        }
+      });
+    });
+
+    function setStatus(button, name, statusText, statusClass) {
+      const driverDiv = button.closest('.driver');
+      const statusSpan = driverDiv.querySelector('.status-indicator');
+      statusSpan.className = 'status-indicator ' + statusClass;
+      statusSpan.textContent = statusText;
+
+      localStorage.setItem(`${statusPrefix}${name}`, `${statusText}|${statusClass}`);
+
+      const now = new Date();
+      const logEntry = `[${now.toLocaleDateString()} ${now.toLocaleTimeString()}] ${name} is now marked as "${statusText}"`;
+
+      const div = document.createElement('div');
+      div.classList.add('report-item');
+      div.textContent = logEntry;
+      logContainer.prepend(div);
+
+      const logs = JSON.parse(localStorage.getItem(logKey)) || [];
+      logs.push(logEntry);
+      if (logs.length > 20) logs.shift();
+      localStorage.setItem(logKey, JSON.stringify(logs));
+
+      allLogs = [...logs].reverse();
+      displayLogs(allLogs);
+    }
+
+    function downloadCSV() {
+      document.getElementById("csvPasswordInput").value = "";
+      document.getElementById("csvPasswordModal").style.display = "flex";
+    }
+
+    function confirmCSVDownload() {
+      const password = document.getElementById("csvPasswordInput").value;
+      const correctPassword = "admin123";
+
+      if (password === correctPassword) {
+        const logs = JSON.parse(localStorage.getItem(logKey)) || [];
+        if (logs.length === 0) {
+          alert("No log data to export.");
+          closeCSVModal();
+          return;
+        }
+
+        let csvContent = "data:text/csv;charset=utf-8,Timestamp,Driver Status Update\n";
+        logs.forEach(log => {
+          const match = log.match(/^\[(.*?)\] (.*)$/);
+          if (match) {
+            const [, timestamp, message] = match;
+            csvContent += `"${timestamp}","${message.replace(/"/g, '""')}"\n`;
+          }
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "driver_status_log.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        closeCSVModal();
+      } else {
+        alert("Incorrect password.");
+      }
+    }
+
+    function closeCSVModal() {
+      document.getElementById("csvPasswordModal").style.display = "none";
+    }
+
+    function clearStatusReport() {
+      document.getElementById("clearPasswordInput").value = "";
+      document.getElementById("clearPasswordModal").style.display = "flex";
+    }
+
+    function confirmClearStatus() {
+      const password = document.getElementById("clearPasswordInput").value;
+      const correctPassword = "admin123";
+
+      if (password === correctPassword) {
+        localStorage.removeItem(logKey);
+        document.getElementById("report-log").innerHTML = "";
+        drivers.forEach(driver => {
+          localStorage.removeItem(`${statusPrefix}${driver}`);
+          const element = Array.from(document.querySelectorAll('.driver')).find(el =>
+            el.querySelector('.driver-name').textContent.includes(driver)
+          );
+          if (element) {
+            const statusSpan = element.querySelector('.status-indicator');
+            statusSpan.className = 'status-indicator';
+            statusSpan.textContent = 'No Status';
+          }
+        });
+        alert("Cars Status report have been cleared.");
+        allLogs = [];
+        closeClearModal();
+      } else {
+        alert("Incorrect password. Clearing canceled.");
+      }
+    }
+
+    function closeClearModal() {
+      document.getElementById("clearPasswordModal").style.display = "none";
+    }
+
+    const menuToggle = document.getElementById("menu-toggle");
+    const navLinks = document.getElementById("nav-links");
+    menuToggle.addEventListener("click", () => {
+      navLinks.classList.toggle("show");
+    });
+
+    const authLink = document.getElementById("authLink");
+    authLink.addEventListener("click", () => {
+      if (authLink.textContent === "Logout") {
+        localStorage.removeItem("isLoggedIn");
+        authLink.textContent = "Login";
+        setInteractivityBasedOnLogin();
+      } else {
+      authLink.onclick = () => {
+        window.location.href = "../../login.html";
+      };
+    }
+    });
+
+    if (localStorage.getItem("isLoggedIn") === "true") {
+      authLink.textContent = "Logout";
+    }
+    setInteractivityBasedOnLogin();
+
+    function setInteractivityBasedOnLogin() {
+      const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+      document.querySelectorAll('.dropdown button, .dropdown-content button, .log-section button').forEach(btn => {
+        btn.disabled = !isLoggedIn;
+        btn.style.opacity = isLoggedIn ? '1' : '0.5';
+        btn.style.cursor = isLoggedIn ? 'pointer' : 'not-allowed';
+      });
+
+      const logSearch = document.getElementById("log-search");
+      if (logSearch) {
+        logSearch.disabled = !isLoggedIn;
+        logSearch.style.opacity = isLoggedIn ? '1' : '0.5';
+        logSearch.style.cursor = isLoggedIn ? 'text' : 'not-allowed';
+      }
+    }
+  </script>
+</main>
+<footer class="footer">
+  <p>&copy; Kurth Clarenze Lacsinto Novesteras. All rights reserved.</p>
