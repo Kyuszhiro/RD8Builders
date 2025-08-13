@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RD8 BUILDERS</title>
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+      flex: 1;
+    }
+
+    header {
+      background-color: #2c3e50;
+    }
+
+    nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px;
+      position: relative;
+    }
+
+    .logo {
+      color: white;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    .menu-toggle span {
+      height: 3px;
+      width: 25px;
+      background: white;
+      border-radius: 2px;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .nav-item, .nav-item-button {
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      padding: 10px 15px;
+      background: none;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .nav-item:hover, .nav-item-button:hover {
+      background-color: white;
+      color: #2c3e50;
+    }
+
+    .dropdown {
+      position: relative;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: #2c3e50;
+      min-width: 220px;
+      z-index: 1000;
+      border-radius: 0 0 6px 6px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .dropdown-content a {
+      display: block;
+      padding: 10px 15px;
+      color: white;
+      text-decoration: none;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #1abc9c;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+      h2{
+      text-align: center;
+      font-size: 15px; 
+      color: white;
+      
+    }
+
+    footer.footer {
+      background-color: #2c3e50;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      margin-top: auto;
+      font-weight: normal;
+    }
+
+      p {
+      text-align: justify;
+      
+    }
+
+
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: flex;
+      }
+
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        background-color: #2c3e50;
+        margin-top: 10px;
+        padding: 10px 0;
+      }
+
+      .nav-links.show {
+        display: flex;
+      }
+
+      .nav-item, .nav-item-button {
+        width: 100%;
+        text-align: left;
+        padding: 10px 20px;
+      }
+
+      .dropdown-content {
+        position: static;
+        box-shadow: none;
+        background-color: #34495e;
+        border-radius: 0;
+      }
+
+      .dropdown:hover .dropdown-content {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <nav>
+      <div class="logo">RD8 BUILDERS</div>
+
+      <div class="menu-toggle" id="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
+      <div class="nav-links" id="nav-links">
+        <a href="Index.html" class="nav-item">Home</a>
+        <a href="AboutUs.html" class="nav-item">About Us</a>
+        <a href="CompanyProfile.html" class="nav-item">Company Profile</a>
+        <a href="ContactUs.html" class="nav-item">Contact Us</a>
+
+        <div class="dropdown" id="deptDropdown" style="display: none;">
+          <button class="nav-item-button">Departments▾</button>
+          <div class="dropdown-content">
+            <a href="#">Executive Department</a>
+            <a href="Departments/Admin/Admin.html">Admin Department</a>
+            <a href="#">Accounting Department</a>
+            <a href="#">Finance Department</a>
+            <a href="#">Human Resources Department</a>
+            <a href="#">IT Department</a>
+            <a href="#">Logistics Department</a>
+            <a href="#">Operations Department</a>
+            <a href="#">Purchasing Department</a>
+          </div>
+        </div>
+
+        <a href="#" class="nav-item" id="authLink">Login</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- About Us Section with Box -->
+  <main style="flex: 1; padding: 40px 20px; display: flex; justify-content: center;">
+    <div style="
+      background-color: white;
+      padding: 40px;
+      max-width: 900px;
+      width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    ">
+      <h1 style="font-size: 32px; color: #2c3e50; margin-bottom: 20px; text-align: center;">About Us</h1>
+
+      <p style="font-size: 18px; line-height: 1.6; color: #333; text-indent: 2em;">
+        <strong>RD8 BUILDERS CORPORATION </strong>,  is a dynamic construction firm that began 
+        its journey as a sole proprietorship in 2017, a construction firm that embodies the dreams and aspirations 
+        of its founders, Rampel and Rovelyn. This husband-and-wife duo has traansformed their initial vision into 
+        a thriving enterprise that not only meets but exceeds the expectations of clients and stakeholders alike. 
+        With a shared passion for construction and a commitment to excellence,  they  established  the  firm with 
+        a clear mission: to provide top-tier construction services that consistently meet and exceed client 
+        expectations. As  the  company  rapidly expanded, it transitioned into a corporation by 2020, allowing  
+        for  a  broader scope of services and programs.
+      </p>
+      <br/>
+      <p style="font-size: 18px; line-height: 1.6; color: #333; text-indent: 2em;">
+        <strong>Rampel</strong>, as the <strong>Chief Executive Officer</strong> and <strong>Head of Marketing</strong>, brings a wealth of experience and strategic 
+        insight to the company. His passion for construction and dedication to excellence has propelled 
+        RD8 Builders Corporation from a Category D to a prestigious Triple A construction firm. This remarkable 
+        evolution is a testament to the hard work, determination, and unwavering commitment of them both. 
+      </p>
+      <br/>
+      <p style="font-size: 18px; line-height: 1.6; color: #333; text-indent: 2em;">
+        <strong>Rovelyn</strong>, serving as the <strong>Chief Financial Officer</strong>, plays a crucial role in the financial management and 
+        sustainability of the business. Her keen business acumen and attention to detail ensure 
+        that RD8 Builders Corporation not only maintains profitability but also invests in innovative practices 
+        and sustainable solutions. By adhering to a strict quality management system, RD8 Builders Corporation 
+        has achieved significant milestones, notably attaining ISO 9001:2015 compliance, which underscores its 
+        commitment to quality and customer satisfaction. 
+      </p>
+
+      <br/>
+      <p style="font-size: 18px; line-height: 1.6; color: #333; text-indent: 2em;"> The firm began its operations with a modest 
+        categorization but, through relentless dedication and hard work, advanced to a Triple A construction 
+        company status by 2023 with ISO 9001:2015 in 2024. This transformation is a testament to RD8's unwavering 
+        focus on quality and a steadfast commitment to its core values. At RD8 Builders Corporation, the philosophy 
+        of quality is paramount. The firm focuses on adherence to all applicable requirements, ensuring that every 
+        project is executed with precision and professionalism. 
+       
+      </p>
+
+      <br/>
+      <p style="font-size: 18px; line-height: 1.6; color: #333; text-indent: 2em;"> 	The company prides itself on delivering quality 
+        work that is not only profitable but also completed within the agreed timelines.This dedication to excellence 
+        is complemented by a strong emphasis on personnel development, where the company invests in training and resources 
+        to enhance the competencies of its workforce. This commitment to team development ensures that the staff is 
+        well-equipped to meet the evolving demands of the construction industry. Innovation and continuous improvement 
+        form the backbone of RD8 Builders Corporation's operations. 
+       
+      </p>
+      
+      <br/>
+      <p style="font-size: 18px; line-height: 1.6; color: #333; text-indent: 2em;"> The firm actively seeks out new methodologies 
+        and technologies to enhance its Quality Management System (QMS), striving for excellence at every stage of the 
+        construction process. By fostering a culture of innovation, RD8 not only meets the current needs of its clients 
+        but also anticipates future demands, positioning itself as a leader in the construction sector. With a strong 
+        foundation built on quality, compliance, and customer satisfaction, RD8 Builders Corporation looks forward to a 
+        future of continued growth and success in the ever-evolving landscape of construction.
+      </p>      
+
+
+
+      <hr style="margin: 40px 0; border: none; height: 1px; background-color: #ccc;">
+
+      <section style="margin-bottom: 30px;">
+        <h2 style="font-size: 28px; color: #2c3e50; margin-bottom: 10px;text-align: center;">Our Mission</h2>
+        <p style="font-size: 18px; line-height: 1.6; color: #333;">
+          •To improve infrastructure through meaningful innovation.
+          <br>
+         •To give satisfaction and surpassed service in our valued customers using our expertise in the design, 
+          manufactureand installation of building components.
+        </p>
+      </section>
+
+      <section>
+        <h2 style="font-size: 28px; color: #2c3e50; margin-bottom: 10px;text-align: center;">Our Vision</h2>
+        <p style="font-size: 18px; line-height: 1.6; color: #333;">
+          •To give highest level of quality construction services at fair and market competitive prices for our customers.
+          <br>
+          •Aiming excellence through commitment, skills, integrity, fairness and disciplined employee with an ongoing 
+          passion to deliver quality, timely and profitable projects.
+        </p>
+      </section>
+    </div>
+  </main>
+
+<footer class="footer" style="text-align:center">
+  <h2>&copy; Kurth Clarenze Lacsinto Novesteras. <br> All rights reserved.</h2>
+</footer>
+
+  <script>
+    const authLink = document.getElementById("authLink");
+    const deptDropdown = document.getElementById("deptDropdown");
+    const menuToggle = document.getElementById("menu-toggle");
+    const navLinks = document.getElementById("nav-links");
+
+    menuToggle.addEventListener("click", () => {
+      navLinks.classList.toggle("show");
+    });
+
+    function updateAuthUI() {
+      const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+      const role = localStorage.getItem("userRole");
+
+      const allLinks = deptDropdown.querySelectorAll(".dropdown-content a");
+
+      if (isLoggedIn) {
+        authLink.textContent = "Logout";
+        deptDropdown.style.display = "block";
+
+        allLinks.forEach(link => link.style.display = "none");
+
+        if (role === "master") {
+          allLinks.forEach(link => link.style.display = "block");
+        } else if (role === "admin") {
+          allLinks.forEach(link => {
+            if (link.textContent.includes("Admin Department")) {
+              link.style.display = "block";
+            }
+          });
+        } else {
+          allLinks.forEach(link => {
+            if (link.textContent.toLowerCase().includes(role)) {
+              link.style.display = "block";
+            }
+          });
+        }
+
+        authLink.onclick = () => {
+          if (confirm("Are you sure you want to logout?")) {
+            localStorage.removeItem("isLoggedIn");
+            localStorage.removeItem("userRole");
+            updateAuthUI();
+          }
+        };
+      } else {
+        authLink.textContent = "Login";
+        deptDropdown.style.display = "none";
+        authLink.onclick = () => {
+          window.location.href = "login.html";
+        };
+      }
+    }
+
+    updateAuthUI();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - RD8 BUILDERS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+    }
+
+    header {
+      background-color: #2c3e50;
+    }
+
+    nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px;
+      position: relative;
+    }
+
+    .logo {
+      color: white;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 4px;
+    }
+
+    .hamburger div {
+      width: 25px;
+      height: 3px;
+      background-color: white;
+      border-radius: 2px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .nav-item {
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .nav-item:hover {
+      background-color: white;
+      color: #2c3e50;
+    }
+
+    .login-wrapper {
+      width: 100%;
+      max-width: 380px;
+      margin: 50px auto;
+      padding: 30px 25px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      text-align: center;
+      color: white;
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background-color: #2c3e50;
+    }
+
+    .login-wrapper h1 {
+      font-size: 1.7rem;
+      margin-bottom: 20px;
+      color: white;
+    }
+
+    .login-wrapper input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background-color: #f1f1f1;
+      color: #2c3e50;
+    }
+
+    .login-wrapper input::placeholder {
+      color: #888;
+    }
+
+    .toggle-password {
+      float: right;
+      margin-top: -30px;
+      margin-right: 10px;
+      font-size: 12px;
+      cursor: pointer;
+      color: #ddd;
+    }
+
+    .login-wrapper button {
+      width: 100%;
+      padding: 10px;
+      background-color: #1abc9c;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .login-wrapper button:hover {
+      background-color: #16a085;
+    }
+
+    .footer {
+      background-color: #2c3e50;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      margin-top: auto;
+    }
+
+    @media (max-width: 768px) {
+      .hamburger {
+        display: flex;
+      }
+
+      .nav-links {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        display: none;
+        margin-top: 10px;
+      }
+
+      .nav-links.show {
+        display: flex;
+      }
+
+      .nav-item {
+        width: 100%;
+        text-align: left;
+      }
+
+      .login-wrapper {
+        margin: 20px;
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <nav>
+      <div class="logo">RD8 BUILDERS</div>
+      <div class="hamburger" onclick="toggleMenu()">
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html" class="nav-item">Home</a>
+        <a href="#" class="nav-item">About Us</a>
+        <a href="#" class="nav-item">Company Profile</a>
+        <a href="#" class="nav-item">Contact Us</a>
+      </div>
+    </nav>
+  </header>
+
+  <div class="login-wrapper">
+    <h1>LOGIN</h1>
+    <input type="text" id="username" placeholder="Username" required>
+    <div style="position: relative;">
+      <input type="password" id="password" placeholder="Password" required>
+      <span class="toggle-password" onclick="togglePassword()">Show</span>
+    </div>
+    <button onclick="handleLogin()">Login</button>
+  </div>
+
+  <footer class="footer">
+    <p>&copy; Kurth Clarenze Lacsinto Novesteras. <br>All rights reserved.</p>
+  </footer>
+
+  <script>
+    function toggleMenu() {
+      const navLinks = document.getElementById("navLinks");
+      navLinks.classList.toggle("show");
+    }
+
+    function togglePassword() {
+      const passwordInput = document.getElementById("password");
+      const toggle = document.querySelector(".toggle-password");
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        toggle.textContent = "Hide";
+      } else {
+        passwordInput.type = "password";
+        toggle.textContent = "Show";
+      }
+    }
+
+    function handleLogin() {
+      const username = document.getElementById("username").value.trim().toLowerCase();
+      const password = document.getElementById("password").value;
+
+      const accounts = {
+        "rd8builders": { password: "rpd2025", role: "master", redirect: "index.html" },
+        "rd8executive": { password: "executive123", role: "executive", redirect: "Departments/Executive/executive.html" },
+        "rd8admin": { password: "admin123", role: "admin", redirect: "index.html" },
+        "rd8bidding": { password: "bidding123", role: "bidding", redirect: "Departments/Bidding/bidding.html" },
+        "rd8hr": { password: "hr123", role: "hr", redirect: "Departments/HR/hr.html" },
+        "rd8finance": { password: "finance123", role: "finance ", redirect: "Departments/Finance/finance.html" },
+        "rd8it": { password: "it123", role: "it", redirect: "Departments/IT/it.html" },
+        "rd8logistics": { password: "logistics123", role: "logistics", redirect: "Departments/Logistics/logistics.html" },
+        "rd8operations": { password: "operations123", role: "operations", redirect: "Departments/Operations/operations.html" },
+        "rd8purchasing": { password: "purchasing123", role: "purchasing", redirect: "Departments/Purchasing/purchasing.html" },
+      };
+
+      if (accounts[username] && accounts[username].password === password) {
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userRole", accounts[username].role);
+        window.location.href = accounts[username].redirect;
+      } else {
+        alert("Invalid username or password!");
+      }
+    }
+  </script>
+
+</body>
+</html>
