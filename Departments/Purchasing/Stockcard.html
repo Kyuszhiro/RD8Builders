@@ -347,7 +347,7 @@
 (function enforceLogin() {
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
   const userRole = localStorage.getItem("userRole");
-  if (!isLoggedIn || (userRole !== "master" && userRole !== "logistics")) {
+  if (!isLoggedIn || (userRole !== "master" && userRole !== "purchasing")) {
     document.documentElement.innerHTML = '<body style="background:#fff; margin:0"></body>';
     window.location.replace("../../login.html");
   }
@@ -1226,3 +1226,4 @@ window.onload = () => {
 </script>
 </body>
 </html>
+
