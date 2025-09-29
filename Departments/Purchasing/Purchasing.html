@@ -264,7 +264,7 @@
     const isLoggedIn = localStorage.getItem("isLoggedIn");
     const userRole = localStorage.getItem("userRole");
 
-    if (!isLoggedIn || (userRole !== "logistics" && userRole !== "master")) {
+    if (!isLoggedIn || (userRole !== "purchasing" && userRole !== "master")) {
       alert("Access denied.");
       window.location.href = "../../login.html";
     }
@@ -301,9 +301,9 @@
             <a href="../Operations/Operations.html">Operations Department</a>
             <a href="../Purchasing/Purchasing.html">Purchasing Department</a>
           `;
-        } else if (userRole === "logistics") {
+        } else if (userRole === "purchasing") {
           deptList.innerHTML = `
-            <a href="Logistics.html">Logistics Department</a>
+            <a href="Purchasing.html">Purchasing Department</a>
           `;
         }
 
@@ -325,3 +325,4 @@
 
 </body>
 </html>
+
