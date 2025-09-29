@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Equipment Rental</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; }
+    html, body { height: 100%; display: flex; flex-direction: column; font-family: 'Montserrat', sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+    main { flex: 1; }
+    nav { background-color: #2c3e50; padding: 15px 25px; color: white; }
+    .nav-container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+    .logo { font-size: 20px; font-weight: 700; color: white; }
+    .nav-links { display: flex; flex-wrap: wrap; gap: 15px; }
+    .nav-item, .nav-item-button { color: white; text-decoration: none; font-size: 16px; padding: 10px 15px; background: none; border: none; border-radius: 6px; cursor: pointer; }
+    .nav-item:hover, .nav-item-button:hover { background-color: white; color: #2c3e50; }
+    .menu-toggle { display: none; flex-direction: column; cursor: pointer; margin-left: auto; gap: 4px; }
+    .menu-toggle span { height: 3px; width: 25px; background: white; border-radius: 3px; }
+    .nav-links.show { display: flex; flex-direction: column; width: 100%; margin-top: 10px; }
+    @media (max-width: 768px) { .menu-toggle { display: flex; } .nav-links { display: none; flex-direction: column; width: 100%; margin-top: 10px; } .nav-item { width: 100%; padding: 10px 0; } }
+    .back-button { display: block; margin: 10px 20px 0; text-align: left; background-color: #2c3e50; color: white; padding: 10px 25px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; text-decoration: none; width: fit-content; }
+    .back-button:hover { background-color: #34495e; }
+    h1 { text-align: center; color: #2c3e50; font-size: 24px; margin-top: 20px; }
+    .form-container { background: #2c3e50; color: white; max-width: 900px; margin: 20px auto; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; font-weight: bold; margin-bottom: 5px; }
+    input { width: 100%; padding: 10px; border: none; border-radius: 6px; font-size: 14px; }
+    .button-wrapper { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+    .button-wrapper button { background-color: #ffffff; color: #2c3e50; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; max-width: 150px; width: 100%; }
+    .button-wrapper button:hover { background-color: #ddd; }
+    .table-wrapper { overflow-x: auto; overflow-y: auto; margin: 30px auto; max-width: 1300px; max-height: 500px; border: 1px solid #ccc; }
+    table { width: 100%; border-collapse: collapse; min-width: 1000px; background-color: white; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; font-size: 14px; }
+    th { background-color: #2c3e50; color: white; }
+    td[contenteditable="true"] { background-color: white; }
+    td.editing { outline: 2px solid #3498db; }
+    .footer { background-color: #2c3e50; color: white; text-align: center; padding: 15px 20px; margin-top: 40px; }
+    input:disabled, button:disabled { background-color: #ccc; color: #555; cursor: not-allowed; opacity: 0.6; }
+    .sort-button { background-color: #2c3e50; color: white; border: none; border-radius: 6px; padding: 8px 15px; cursor: pointer; margin: 0 5px; transition: transform 0.1s, background-color 0.2s; }
+    .sort-button:hover { background-color: #34495e; }
+    .sort-button:active { transform: scale(0.95); background-color: #1f2d3a; }
+    .grand-total-row td {
+  font-size: 16px;
+  padding: 12px;
+}
+select {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: white;
+  color: #333;
+}
+
+/* Fade only the placeholder text inside the dropdown list */
+select option[disabled] {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+/* Fade the default text in the box before user selects */
+select:invalid {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+/* Once a valid option is chosen (HR or DAY), restore normal color */
+select option {
+  color: #333;
+}
+
+.filter-container {
+  background: #ffffff;
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  align-items: center;
+}
+
+.filter-container label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  color: #2c3e50;
+  font-size: 14px;
+  
+}
+
+.filter-container input {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+table th:first-child,
+table td:first-child {
+  min-width: 100px; /* adjust as needed */
+  white-space: nowrap; /* prevents wrapping */
+}
+
+
+
+
+  </style>
+
+  <script>
+  // ---------------- LOGIN ENFORCEMENT ----------------
+  (function enforceLogin() {
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  const userRole = localStorage.getItem("userRole");
+
+  if (!isLoggedIn || (userRole !== "master" && userRole !== "logistics")) {
+    // Show white background instantly
+    document.documentElement.innerHTML = '<body style="background:#fff; margin:0"></body>';
+    
+    // Redirect to login
+    window.location.replace("../../login.html");
+  }
+})();
+</script>
+</head>
+<body>
+<main>
+<header>
+<nav>
+  <div class="nav-container">
+    <div class="logo">RD8 BUILDERS CORP</div>
+    <div class="menu-toggle" id="menu-toggle"><span></span><span></span><span></span></div>
+    <div class="nav-links" id="nav-links">
+      <a href="../../Index.html" class="nav-item">Home</a>
+      <a href="../../AboutUs.html" class="nav-item">About Us</a>
+      <a href="../../CompanyProfile.html" class="nav-item">Company Profile</a>
+      <a href="../../ContactUs.html" class="nav-item">Contact Us</a>
+      <a href="#" class="nav-item" id="authLink">Login</a>
+    </div>
+  </div>
+</nav>
+<a class="back-button" href="Logistics.html">← Back to Logistics</a>
+</header>
+
+<h1>EQUIPMENT RENTALS</h1>
+
+<div class="form-container">
+  <div class="form-group"><label>Date:</label><input type="date" id="date"></div>
+  <div class="form-group"><label>Equipment Code:</label><input type="text" id="equipment"></div>
+  <div class="form-group"><label>Operator:</label><input type="text" id="operator"></div>
+  <div class="form-group"><label>Site:</label><input type="text" id="site"></div>
+  <div class="form-group"><label>Unit Code:</label><input type="text" id="unitCode"></div>
+  <div class="form-group"><label>Status:</label><input type="text" id="s1"></div>
+  <div class="form-group"><label>ECV No.:</label><input type="text" id="ecv"></div>
+  <div class="form-group"><label>System:</label><input type="text" id="system"></div>
+  <div class="form-group"><label>Hour/s:</label><input type="number" id="hrs"></div>
+  <div class="form-group"><label>Minute/s:</label><input type="number" id="mins"></div>
+  <div class="form-group"><label>Rate:</label><input type="number" id="rate"></div>
+  <div class="form-group">
+  <label>Measure:</label>
+  <select id="measure" required>
+    <option value="" disabled selected hidden>Choose Measure</option>
+    <option value="HR">HR</option>
+    <option value="DAY">DAY</option>
+  </select>
+</div>
+
+<!-- Remove Confirmation Modal -->
+<div id="removeModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
+  <div style="background:white; padding:20px; border-radius:10px; max-width:400px; width:90%; text-align:center; box-shadow:0 4px 15px rgba(0,0,0,0.3);">
+    <p style="font-size:18px; margin-bottom:20px;">Are you sure you want to remove this entry?</p>
+    <div style="display:flex; justify-content:center; gap:20px;">
+      <button id="confirmRemove" style="background:#e74c3c; color:white; border:none; padding:10px 20px; border-radius:6px; cursor:pointer;">Yes</button>
+      <button id="cancelRemove" style="background:#ccc; color:#333; border:none; padding:10px 20px; border-radius:6px; cursor:pointer;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+  <div class="button-wrapper">
+    <button onclick="postDetails()">Submit</button>
+    <button onclick="toggleEditMode()">Edit Mode</button>
+  </div>
+</div>
+
+
+<div class="filter-container">
+  <label>Date From
+  <input type="date" id="filterStartDate" onchange="applyFilters()">
+</label>
+<label>Date To
+  <input type="date" id="filterEndDate" onchange="applyFilters()">
+</label>
+  <label>Equipment
+    <input type="text" id="filterEquipment" oninput="applyFilters()" placeholder="Type equipment">
+  </label>
+  <label>Operator
+    <input type="text" id="filterOperator" oninput="applyFilters()" placeholder="Type operator">
+  </label>
+  <label>Site
+    <input type="text" id="filterSite" oninput="applyFilters()" placeholder="Type site">
+  </label>
+  <button onclick="clearFilters()" class="sort-button">Clear Filters</button>
+</div>
+
+<div class="table-wrapper">
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Equipment Code</th>
+        <th>Operator</th>
+        <th>Site</th>
+        <th>Unit Code</th>
+        <th>Status</th>
+        <th>ECV No.</th>
+        <th>System</th>
+        <th>Hours</th>
+        <th>Minutes</th>
+        <th>Rate</th>
+        <th>Measure</th>
+        <th>Remove</th>
+      </tr>
+    </thead>
+    <tbody id="dataBody"></tbody>
+  </table>
+</div>
+
+<div style="text-align:center; margin: 20px;">
+  <button onclick="generateSummary()" style="background-color: #27ae60;color: white;padding: 10px 20px;border: none;border-radius: 6px;cursor: pointer;font-size: 16px;">Generate Summary Report</button>
+</div>
+
+<div class="table-wrapper" id="summaryWrapper" style="display:none;">
+  <h2 style="text-align:center; color:#2c3e50;">Summary Report</h2>
+  <table id="summaryTable">
+  <!-- ✅ Add "Work Hours" column header in Summary Report -->
+<thead>
+  <tr>
+    <th>Date</th>
+    <th>Equipment Code</th>
+    <th>Operator</th>
+    <th>Site</th>
+    <th>Unit Code</th>
+    <th>Status</th>
+    <th>ECV No.</th>
+    <th>System</th>
+    <th>Hours</th>
+    <th>Minutes</th>
+    <th>Work Hours</th>
+    <th>Rate</th>
+    <th>Measure</th>
+    <th>Gross Rental</th> <!-- ✅ NEW COLUMN -->
+  </tr>
+</thead>
+
+
+
+    <tbody></tbody>
+<tfoot>
+  <tr class="grand-total-row">
+    <td colspan="8" style="background:#2c3e50;color:white;font-weight:bold;text-align:center;">
+      Grand Total
+    </td>
+    <td id="grandTotalHrs" style="background:#27ae60;color:white;font-weight:bold;"></td> <!-- Total HRS -->
+    <td id="grandTotalMins" style="background:#27ae60;color:white;font-weight:bold;"></td> <!-- Total Mins -->
+    <td id="grandTotalWorkHours" style="background:#27ae60;color:white;font-weight:bold;"></td> <!-- Work Hours -->
+    <td style="background:#2c3e50;"></td>
+    <td style="background:#2c3e50;"></td>
+  </tr>
+</tfoot>
+
+  </table>
+</div>
+
+<div style="text-align:center; margin: 10px;">
+  <button id="downloadSummaryBtn" onclick="downloadSummary()" style="background-color: #2980b9;color: white;padding: 10px 20px;border: none;border-radius: 6px;cursor: pointer;font-size: 16px;display: none;">Download Summary Report</button>
+</div>
+
+</main>
+
+<footer class="footer">
+  <p>&copy; Kurth Clarenze Lacsinto Novesteras. All rights reserved.</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+
+      // ---------------- LOGIN ENFORCEMENT ----------------
+  let entries = JSON.parse(localStorage.getItem("rentalEntries") || "[]"); // new key
+  let editingEnabled = false;
+  let sortOrder = { date: true, equipment: true, operator: true };
+
+  function save(){ localStorage.setItem("rentalEntries", JSON.stringify(entries)); }
+
+  function postDetails() {
+    const entry = {
+      date: date.value,
+      equipment: equipment.value,
+      operator: operator.value,
+      site: site.value,
+      unitCode: unitCode.value,
+      s1: s1.value,
+      ecv: ecv.value,
+      system: system.value,
+      hrs: hrs.value,
+      mins: mins.value,
+      rate: rate.value,
+      measure: measure.value
+    };
+
+    if(!entry.date || !entry.equipment) { alert("Fill required fields"); return; }
+
+    entries.push(entry);
+    save();
+    updateTable();
+
+    document.querySelectorAll(".form-container input").forEach(i=>i.value="");
+  }
+
+  let filters = { startDate: "", endDate: "", equipment: "", operator: "", site: "" };
+
+
+function applyFilters() {
+  filters.startDate = document.getElementById("filterStartDate").value;
+  filters.endDate = document.getElementById("filterEndDate").value;
+  filters.equipment = document.getElementById("filterEquipment").value.toLowerCase();
+  filters.operator = document.getElementById("filterOperator").value.toLowerCase();
+  filters.site = document.getElementById("filterSite").value.toLowerCase();
+  updateTable();
+}
+
+
+function clearFilters() {
+  document.getElementById("filterStartDate").value = "";
+  document.getElementById("filterEndDate").value = "";
+  document.getElementById("filterEquipment").value = "";
+  document.getElementById("filterOperator").value = "";
+  document.getElementById("filterSite").value = "";
+  filters = { startDate: "", endDate: "", equipment: "", operator: "", site: "" };
+  updateTable();
+}
+
+
+function updateTable() {
+  const body = document.getElementById("dataBody");
+  body.innerHTML = "";
+
+  let filteredEntries = entries.filter(e => {
+  const entryDate = new Date(e.date);
+  const startDate = filters.startDate ? new Date(filters.startDate) : null;
+  const endDate = filters.endDate ? new Date(filters.endDate) : null;
+
+  let dateMatch = true;
+  if (startDate && endDate) dateMatch = entryDate >= startDate && entryDate <= endDate;
+  else if (startDate) dateMatch = entryDate >= startDate;
+  else if (endDate) dateMatch = entryDate <= endDate;
+
+  return (
+    dateMatch &&
+    (!filters.equipment || e.equipment.toLowerCase().includes(filters.equipment)) &&
+    (!filters.operator || e.operator.toLowerCase().includes(filters.operator)) &&
+    (!filters.site || e.site.toLowerCase().includes(filters.site))
+  );
+});
+
+  filteredEntries.forEach((e, i) => {
+    const row = document.createElement("tr");
+    ["date","equipment","operator","site","unitCode","s1","ecv","system","hrs","mins","rate","measure"].forEach(key => {
+      const td = document.createElement("td");
+      let value = e[key];
+      if (key === "hrs") {
+        const hrs = Number(e.hrs) || 0;
+        value = `${hrs} hr${hrs !== 1 ? "s" : ""}`;
+      }
+      if (key === "mins") {
+        const mins = Number(e.mins) || 0;
+        value = `${mins} min${mins !== 1 ? "s" : ""}`;
+      }
+      td.textContent = value;
+      if (editingEnabled) {
+        td.contentEditable = true;
+        td.classList.add("editing");
+        td.oninput = () => {
+          entries[i][key] = td.textContent.replace(/\D/g, "");
+          save();
+        };
+      }
+      row.appendChild(td);
+    });
+
+    const td = document.createElement("td");
+    const btn = document.createElement("button");
+    btn.textContent = "Remove";
+    btn.style.background = "#e74c3c";
+    btn.style.color = "white";
+    btn.style.border = "none";
+    btn.style.padding = "5px 10px";
+    btn.style.borderRadius = "4px";
+    btn.onclick = () => {
+      entries.splice(i, 1);
+      save();
+      updateTable();
+    };
+    td.appendChild(btn);
+    row.appendChild(td);
+    body.appendChild(row);
+  });
+}
+
+
+
+  function sortBy(field){
+    entries.sort((a,b)=>{
+      let valA=a[field]; let valB=b[field];
+      if(valA<valB) return sortOrder[field]?-1:1;
+      if(valA>valB) return sortOrder[field]?1:-1;
+      return 0;
+    });
+    sortOrder[field]=!sortOrder[field];
+    updateTable();
+  }
+  function formatWorkHours(hrs, mins) {
+  let totalMins = (Number(hrs) || 0) * 60 + (Number(mins) || 0);
+  let h = Math.floor(totalMins / 60);
+  let m = totalMins % 60;
+  return `${h}hr${h!==1 ? 's' : ''} ${m}min${m!==1 ? 's' : ''}`;
+}
+
+  function toggleEditMode(){ editingEnabled=!editingEnabled; updateTable(); }
+
+  function generateSummary() {
+  const tbody = document.querySelector("#summaryTable tbody");
+  tbody.innerHTML = "";
+
+  let totalHrs = 0;
+  let totalMins = 0;
+  let totalMinutes = 0;
+  let totalGross = 0; // ✅ new total
+
+  let filteredEntries = entries.filter(e => {
+  const entryDate = new Date(e.date);
+  const startDate = filters.startDate ? new Date(filters.startDate) : null;
+  const endDate = filters.endDate ? new Date(filters.endDate) : null;
+
+  let dateMatch = true;
+  if (startDate && endDate) dateMatch = entryDate >= startDate && entryDate <= endDate;
+  else if (startDate) dateMatch = entryDate >= startDate;
+  else if (endDate) dateMatch = entryDate <= endDate;
+
+  return (
+    dateMatch &&
+    (!filters.equipment || e.equipment.toLowerCase().includes(filters.equipment)) &&
+    (!filters.operator || e.operator.toLowerCase().includes(filters.operator)) &&
+    (!filters.site || e.site.toLowerCase().includes(filters.site))
+  );
+});
+
+
+  filteredEntries.forEach(e => {
+    const hrs = Number(e.hrs) || 0;
+    const mins = Number(e.mins) || 0;
+    const rate = Number(e.rate) || 0;
+    const workHoursFormatted = formatWorkHours(hrs, mins);
+
+    // ✅ Compute Gross Rental
+    let gross = 0;
+    if (e.measure === "HR") {
+      gross = (rate * hrs) + (rate * (mins / 60));
+    } else if (e.measure === "DAY") {
+      gross = rate;
+    }
+
+    totalGross += gross;
+
+    const tr = document.createElement("tr");
+    const rateFormatted = (Number(rate) || 0).toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const grossFormatted = gross.toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+tr.innerHTML = `
+  <td>${e.date}</td>
+  <td>${e.equipment}</td>
+  <td>${e.operator}</td>
+  <td>${e.site}</td>
+  <td>${e.unitCode}</td>
+  <td>${e.s1}</td>
+  <td>${e.ecv}</td>
+  <td>${e.system}</td>
+  <td>${hrs} hr${hrs !== 1 ? 's' : ''}</td>
+  <td>${mins} min${mins !== 1 ? 's' : ''}</td>
+  <td>${workHoursFormatted}</td>
+  <td>${rateFormatted}</td>   <!-- ✅ formatted -->
+  <td>${e.measure}</td>
+  <td>${grossFormatted}</td>  <!-- ✅ formatted -->
+`;
+
+    tbody.appendChild(tr);
+
+    totalHrs += hrs;
+    totalMins += mins;
+    totalMinutes += hrs * 60 + mins;
+  });
+
+  document.getElementById("grandTotalHrs").textContent =
+    `${totalHrs} hr${totalHrs !== 1 ? 's' : ''}`;
+  document.getElementById("grandTotalMins").textContent =
+    `${totalMins} min${totalMins !== 1 ? 's' : ''}`;
+  document.getElementById("grandTotalWorkHours").textContent =
+    formatWorkHours(Math.floor(totalMinutes / 60), totalMinutes % 60);
+
+  // ✅ Add Gross Rental Grand Total
+  let grossTotalCell = document.getElementById("grandTotalGross");
+  if (!grossTotalCell) {
+    const row = document.querySelector("#summaryTable tfoot tr");
+    const td = document.createElement("td");
+    td.id = "grandTotalGross";
+    td.style.background = "#27ae60";
+    td.style.color = "white";
+    td.style.fontWeight = "bold";
+    row.appendChild(td);
+  }
+  document.getElementById("grandTotalGross").textContent =
+  totalGross.toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+
+  document.getElementById("summaryWrapper").style.display = "block";
+  document.getElementById("downloadSummaryBtn").style.display = "inline-block";
+}
+
+
+
+  function downloadSummary(){
+  const ws_data = [["Item No","Date","Equipment","Project Code", "ECV No.", "Amount"]]; // ✅ detailed header
+
+  let filteredEntries = entries.filter(e => {
+  const entryDate = new Date(e.date);
+  const startDate = filters.startDate ? new Date(filters.startDate) : null;
+  const endDate = filters.endDate ? new Date(filters.endDate) : null;
+
+  let dateMatch = true;
+  if (startDate && endDate) dateMatch = entryDate >= startDate && entryDate <= endDate;
+  else if (startDate) dateMatch = entryDate >= startDate;
+  else if (endDate) dateMatch = entryDate <= endDate;
+
+  return (
+    dateMatch &&
+    (!filters.equipment || e.equipment.toLowerCase().includes(filters.equipment)) &&
+    (!filters.operator || e.operator.toLowerCase().includes(filters.operator)) &&
+    (!filters.site || e.site.toLowerCase().includes(filters.site))
+  );
+});
+
+  let totalGross = 0;
+  let equipmentTotals = {}; // ✅ per-equipment summary
+
+  // ✅ Detailed rows
+  filteredEntries.forEach((e, index) => {
+    const hrs = Number(e.hrs) || 0;
+    const mins = Number(e.mins) || 0;
+    const rate = Number(e.rate) || 0;
+
+    let gross = 0;
+    if (e.measure === "HR") gross = (rate * hrs) + (rate * (mins / 60));
+    else if (e.measure === "DAY") gross = rate;
+
+    totalGross += gross;
+
+    // ✅ Track per equipment total
+    if (!equipmentTotals[e.equipment]) equipmentTotals[e.equipment] = 0;
+    equipmentTotals[e.equipment] += gross;
+
+    ws_data.push([
+      index + 1, // ItemNo
+      e.date,
+      e.equipment,
+      e.site,
+      e.ecv,
+      gross.toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2})
+    ]);
+  });
+
+  // ✅ Grand Total row for detailed section
+  ws_data.push(["", "", "", "", "Grand Total",
+    totalGross.toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2})
+  ]);
+
+  // ✅ Blank row to separate sections
+  ws_data.push([]);
+  ws_data.push(["Equipment Summary"]);
+  ws_data.push(["Equipment Code","Total Gross Rental"]);
+
+  // ✅ Equipment totals
+  let summaryGrandTotal = 0;
+  for (let eq in equipmentTotals) {
+    ws_data.push([
+      eq,
+      equipmentTotals[eq].toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2})
+    ]);
+    summaryGrandTotal += equipmentTotals[eq];
+  }
+
+  // ✅ Grand total for equipment summary
+  ws_data.push(["Grand Total",
+    summaryGrandTotal.toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2})
+  ]);
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(ws_data);
+
+  // Auto column width
+  const colWidths = ws_data[0].map((_, colIndex) => {
+    let maxLength = 10;
+    ws_data.forEach(row => {
+      const cell = row[colIndex] ? row[colIndex].toString() : "";
+      if (cell.length > maxLength) maxLength = cell.length;
+    });
+    return { wch: maxLength + 2 };
+  });
+  ws['!cols'] = colWidths;
+
+  XLSX.utils.book_append_sheet(wb, ws, "Summary Report");
+  XLSX.writeFile(wb, "rental_summary_report.xlsx");
+}
+
+
+
+  const authLink=document.getElementById("authLink");
+  function updateAuthUI(){
+    const isLoggedIn=localStorage.getItem("isLoggedIn")==="true";
+    if(isLoggedIn){ authLink.textContent="Logout"; authLink.onclick=()=>{ if(confirm("Logout?")){localStorage.removeItem("isLoggedIn");window.location.href="../../login.html";} }; }
+    else { authLink.textContent="Login"; authLink.onclick=()=>{window.location.href="../../login.html";}; }
+  }
+
+  window.onload=()=>{ updateTable(); updateAuthUI(); if(localStorage.getItem("isLoggedIn")!=="true"){ document.querySelectorAll("input,button").forEach(el=>{ if(el.id!=="authLink") el.disabled=true; }); } };
+</script>
+</body>
+</html>

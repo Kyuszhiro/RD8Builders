@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Equipment History Record</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; display: flex; flex-direction: column; font-family: 'Montserrat', sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+  main { flex: 1; }
+
+  nav { background-color: #2c3e50; padding: 15px 25px; color: white; }
+  .nav-container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+  .logo { font-size: 20px; font-weight: 700; color: white; }
+  .nav-links { display: flex; flex-wrap: wrap; gap: 15px; }
+  .nav-item { color: white; text-decoration: none; font-size: 16px; padding: 10px 15px; background: none; border: none; border-radius: 6px; cursor: pointer; }
+  .nav-item:hover { background-color: white; color: #2c3e50; }
+  @media (max-width: 768px) { 
+    .menu-toggle { display: flex; } 
+    .nav-links { display: none; flex-direction: column; width: 100%; margin-top: 10px; } 
+    .nav-item { width: 100%; padding: 10px 0; } 
+  }
+
+  .back-button { display: block; margin: 10px 20px 0; text-align: left; background-color: #2c3e50; color: white; padding: 10px 25px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; text-decoration: none; width: fit-content; }
+  .back-button:hover { background-color: #34495e; }
+
+  h1 { text-align: center; color: #2c3e50; font-size: 24px; margin-top: 20px; }
+
+  .form-container { background: #2c3e50; color: white; max-width: 600px; margin: 20px auto; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+  .form-group { margin-bottom: 15px; }
+  label { display: block; font-weight: bold; margin-bottom: 5px; color: #2c3e50; }
+  input, select { width: 100%; padding: 10px; border: none; border-radius: 6px; font-size: 14px; }
+
+  .button-wrapper { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+  .button-wrapper button { background-color: #ffffff; color: #2c3e50; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; max-width: 150px; width: 100%; }
+  .button-wrapper button:hover { background-color: #ddd; }
+
+  .footer { background-color: #2c3e50; color: white; text-align: center; padding: 15px 20px; margin-top: 40px; }
+
+ .top-button-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+  .toggle-form-btn { background-color: #2c3e50; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: 600; transition: background 0.18s; min-width:140px; }
+  .toggle-form-btn:hover { background-color: #34495e; }
+
+/* Stock area (below top buttons) */
+.stock-area {
+  max-width: 900px;
+  margin: 18px auto;
+  display: none; /* toggled by Add Stock Card */
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+/* location select row - centered and narrow dropdown */
+.location-row {
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* center the label and select */
+}
+
+/* make the main stock dropdown narrower and centered */
+#stockSiteDropdown {
+  width: 320px;
+  max-width: 90%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #000;
+  text-align: center;         /* fallback */
+  text-align-last: center;    /* centers selected text */
+}
+
+/* Item row: center and make item select a bit narrower too */
+.item-row {
+  width: 100%;
+  max-width: 700px;
+}
+
+.item-select {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+.item-select select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.action-buttons .toggle-form-btn {
+  padding: 8px 15px;
+  font-size: 14px;
+}
+
+
+.item-row .item-select { flex: 0 0 auto; min-width: 220px; }
+#itemDropdown {
+  width: 280px;
+  max-width: 85%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #000;
+  text-align: center;         
+  text-align-last: center;    
+}
+
+.item-row .action-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+.action-buttons .small-btn { padding: 10px 12px; min-width: 120px; }
+
+/* site form small width */
+#addsiteFormWrapper {
+  max-width: 700px;   /* match dropdown width */
+  width: 100%;
+  margin-bottom: 15px; /* spacing before dropdown */
+}
+#addItemFormWrapper {
+  max-width: 700px;   /* match addsiteFormWrapper */
+  width: 100%;
+  margin-bottom: 15px; /* optional spacing */
+}
+
+/* responsive tweaks */
+@media (max-width: 480px) {
+  #stockSiteDropdown { width: 90%; }
+  #itemDropdown { width: 90%; }
+  .toggle-form-btn { min-width: 120px; padding: 10px 12px; }
+}
+
+.item-action-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Receiving & Issuance forms styled like site/item forms */
+#receivingFormWrapper,
+#issuanceFormWrapper {
+  max-width: 700px;
+  width: 100%;
+  margin: 15px auto;
+  padding: 18px;
+  background: #2c3e50;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  color: #000;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+#receivingFormWrapper h3,
+#issuanceFormWrapper h3 {
+  text-align: center;
+  color: #fafafa;
+  margin-bottom: 15px;
+}
+
+#receivingFormWrapper label,
+#issuanceFormWrapper label {
+  color: #fafafa;
+}
+
+#receivingFormWrapper input,
+#issuanceFormWrapper input {
+  border: 1px solid #ccc;
+  background: #fafafa;
+}
+
+#receivingFormWrapper .button-wrapper button,
+#issuanceFormWrapper .button-wrapper button {
+  background-color: #fafafa;
+  color: w34495e;
+  font-weight: 600;
+}
+
+/* ================= TABLE STYLES ================= */
+.table-container {
+  width: 100%;
+  max-width: 100%;
+  margin: 25px auto;
+  border-radius: 10px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+  background: #fff;
+  padding: 20px;
+  overflow-x: auto;
+}
+#dbTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  text-align: center;
+  table-layout: auto; /* allow columns to adjust width automatically */
+}
+
+#dbTable thead {
+  background-color: #2c3e50;
+  color: #fff;
+}
+
+#dbTable th,
+#dbTable td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  white-space: nowrap;      /* prevent text wrapping */
+  overflow: hidden;
+  text-overflow: ellipsis;  /* truncate overflow with ... if needed */
+}
+
+/* Make Supplier / Origin and Purpose / Location Use wider */
+#dbTable th:nth-child(5),
+#dbTable td:nth-child(5) { min-width: 180px; }
+#dbTable th:nth-child(8),
+#dbTable td:nth-child(8) { min-width: 200px; }
+
+/* Balance & Actions can remain small */
+#dbTable th:nth-child(11),
+#dbTable td:nth-child(11) { width: 70px; }
+#dbTable th:nth-child(12),
+#dbTable td:nth-child(12) { width: 120px; }
+
+/* Action buttons stack vertically on very small screens */
+@media (max-width: 480px) {
+  #dbTable td:nth-child(12) button {
+    display: block;
+    width: 100%;
+    margin-bottom: 5px;
+  }
+}
+
+
+#dbTable tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+
+#dbTable td button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  #dbTable {
+    font-size: 12px;   /* slightly smaller text on mobile */
+  }
+}
+
+/* ================= TABLE STYLES 2 ================= */
+
+#viewStockTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  text-align: center;
+  table-layout: auto; /* allow columns to adjust width automatically */
+}
+
+#viewStockTable thead {
+  background-color: #2c3e50;
+  color: #fff;
+}
+
+#viewStockTable th,
+#viewStockTable td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  white-space: nowrap;      /* prevent text wrapping */
+  overflow: hidden;
+  text-overflow: ellipsis;  /* truncate overflow with ... if needed */
+}
+
+/* Make Supplier / Origin and Purpose / Location Use wider */
+#viewStockTable th:nth-child(5),
+#viewStockTable td:nth-child(5) { min-width: 180px; }
+#viewStockTable th:nth-child(8),
+#viewStockTable td:nth-child(8) { min-width: 200px; }
+
+/* Balance & Actions can remain small */
+#viewStockTable th:nth-child(11),
+#viewStockTable td:nth-child(11) { width: 70px; }
+#viewStockTable th:nth-child(12),
+#viewStockTable td:nth-child(12) { width: 120px; }
+
+/* Action buttons stack vertically on very small screens */
+@media (max-width: 480px) {
+  #viewStockTable td:nth-child(12) button {
+    display: block;
+    width: 100%;
+    margin-bottom: 5px;
+  }
+}
+
+
+#viewStockTable tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+
+#viewStockTable td button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  #viewStockTable {
+    font-size: 12px;   /* slightly smaller text on mobile */
+  }
+}
+
+
+</style>
+
+<script>
+// ---------------- LOGIN ENFORCEMENT ----------------
+(function enforceLogin() {
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  const userRole = localStorage.getItem("userRole");
+  if (!isLoggedIn || (userRole !== "master" && userRole !== "logistics")) {
+    document.documentElement.innerHTML = '<body style="background:#fff; margin:0"></body>';
+    window.location.replace("../../login.html");
+  }
+})();
+</script>
+</head>
+<body>
+<main>
+<header>
+<nav>
+  <div class="nav-container">
+    <div class="logo">RD8 BUILDERS CORP</div>
+    <div class="menu-toggle" id="menu-toggle"><span></span><span></span><span></span></div>
+    <div class="nav-links" id="nav-links">
+      <a href="../../Index.html" class="nav-item">Home</a>
+      <a href="../../AboutUs.html" class="nav-item">About Us</a>
+      <a href="../../CompanyProfile.html" class="nav-item">Company Profile</a>
+      <a href="../../ContactUs.html" class="nav-item">Contact Us</a>
+      <a href="#" class="nav-item" id="authLink">Login</a>
+    </div>
+  </div>
+</nav>
+<a class="back-button" href="Purchasing.html">← Back to Purchasing</a>
+</header>
+
+<h1>STOCK CARDS</h1>
+
+<!-- Top buttons row -->
+<div class="top-button-wrapper">
+  <button class="toggle-form-btn" onclick="showSiteForm()">Add Site</button>
+  <button class="toggle-form-btn" onclick="toggleStockArea()">Add Stock Card</button>
+  <button class="toggle-form-btn" onclick="viewStockCards()">View Stock Cards</button>
+</div>
+
+<!-- View Stock Cards Table -->
+<div id="viewStockTableWrapper" class="table-container" style="display:none;">
+  <table id="viewStockTable">
+    <thead>
+      <tr>
+        <th>Site Name</th>
+        <th>Item</th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>DR./PO No.</th>
+        <th>RR No.</th>
+        <th>Supplier / Origin</th>
+        <th>WS/DR No.</th>
+        <th>Issued To</th>
+        <th>Purpose / Location Use</th>
+        <th>In</th>
+        <th>Out</th>
+        <th>Balance</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <br>
+  <div style="text-align:center; margin-bottom:10px;">
+    <button class="toggle-form-btn small-btn" onclick="hideStockTable()">Hide Table</button>
+  </div>
+</div>
+
+<!-- Add Site form (independent, hidden until pressed) -->
+<div id="addsiteFormWrapper" class="form-container" style="display:none;">
+  <div class="form-group">
+    <label>Location / Site:</label>
+    <input type="text" id="siteLocation" placeholder="Enter site location">
+  </div>
+
+  <div class="button-wrapper">
+    <button onclick="postsite()">Submit</button>
+    <button onclick="hideSiteForm()">Hide Form</button>
+  </div>
+</div>
+
+<!-- STOCK AREA: only for dropdown + item row -->
+<div class="stock-area" id="stockArea">
+  <!-- Select Location -->
+  <div class="location-row">
+    <label for="stockSiteDropdown" style="color: #2c3e50;;">- Select Location -</label>
+    <select id="stockSiteDropdown" onchange="onSiteSelected()"></select>
+  </div>
+
+  <!-- Item row (appears after selecting location) -->
+  <div class="item-row" id="itemRow" style="display:none; flex-direction:column; align-items:center; gap:15px;">
+
+  <!-- Row 2: Fixed action buttons -->
+  <div class="action-buttons">
+    <button class="toggle-form-btn small-btn" onclick="onAddItem()">Add Item</button>
+    <button class="toggle-form-btn small-btn" onclick="onViewDB()">View Stock Cards</button>
+    <button class="toggle-form-btn small-btn" onclick="onDeleteSite()">Delete Site</button>
+  </div>
+
+  <!-- Row 1: Item dropdown + Receiving/Issuance -->
+  <div class="item-select">
+    <label for="itemDropdown" style="display:none;">- Select Item -</label>
+    <select id="itemDropdown" onchange="onItemSelected()">
+      <option value="">- Select Item -</option>
+    </select>
+
+    <!-- Receiving / Issuance buttons (hidden at first) -->
+    <div id="itemActionButtons" class="item-action-buttons" style="display:none; margin-top:12px;">
+      <button class="toggle-form-btn small-btn" onclick="onReceiving()">Add Receiving</button>
+      <button class="toggle-form-btn small-btn" onclick="onIssuance()">Add Issuance</button>
+      <button class="toggle-form-btn small-btn" onclick="onDeleteItem()">Delete Item</button>
+    </div>
+  </div>
+
+
+  <!-- Receiving form (hidden at first) -->
+<div id="receivingFormWrapper" class="form-container" style="display:none;">
+  <h3>Receiving Form</h3>
+
+  <div class="form-group">
+    <label>Date:</label>
+    <input type="date" id="receivingDate">
+  </div>
+  <div class="form-group">
+    <label for="receivingTime">Time</label>
+    <input type="time" id="receivingTime" required>
+  </div>
+  <div class="form-group">
+    <label>DR./PO No.:</label>
+    <input type="text" id="receivingDRPO" placeholder="Enter DR./PO No.">
+  </div>
+  <div class="form-group">
+    <label>RR No.:</label>
+    <input type="text" id="receivingRR" placeholder="Enter RR No.">
+  </div>
+  <div class="form-group">
+    <label>Supplier / Origin:</label>
+    <input type="text" id="receivingSupplier" placeholder="Enter Supplier / Origin">
+  </div>
+  <div class="form-group">
+    <label>Quantity In:</label>
+    <input type="number" id="receivingQty" placeholder="Enter quantity in">
+  </div>
+  <div class="button-wrapper">
+    <button onclick="submitReceiving()">Submit</button>
+    <button onclick="hideReceivingForm()">Hide Form</button>
+  </div>
+</div>
+
+<!-- Issuance form (hidden at first) -->
+<div id="issuanceFormWrapper" class="form-container" style="display:none;">
+  <h3>Issuance Form</h3>
+  <div class="form-group">
+    <label>Date:</label>
+    <input type="date" id="issuanceDate">
+  </div>
+  <div class="form-group">
+    <label for="issuanceTime">Time</label>
+    <input type="time" id="issuanceTime" required>
+  </div>
+  <div class="form-group">
+    <label>WS/DR No.:</label>
+    <input type="text" id="issuanceDR" placeholder="Enter WS/DR No.">
+  </div>
+  <div class="form-group">
+    <label>Issued To:</label>
+    <input type="text" id="issuanceTo" placeholder="Enter recipient name">
+  </div>
+  <div class="form-group">
+    <label>Purpose / Location Use:</label>
+    <input type="text" id="issuancePurpose" placeholder="Enter purpose / location">
+  </div>
+  <div class="form-group">
+    <label>Quantity Out:</label>
+    <input type="number" id="issuanceQty" placeholder="Enter quantity out">
+  </div>
+  <div class="button-wrapper">
+    <button onclick="submitIssuance()">Submit</button>
+    <button onclick="hideIssuanceForm()">Hide Form</button>
+  </div>
+</div>
+
+
+</div>
+
+
+<!-- Add Item form (hidden until Add Item pressed) -->
+<div id="addItemFormWrapper" class="form-container" style="display:none; margin-top:10px;">
+  <div class="form-group">
+    <label>Item Name:</label>
+    <input type="text" id="itemName" placeholder="Enter item name">
+  </div>
+
+  <div class="button-wrapper">
+    <button onclick="postItem()">Submit</button>
+    <button onclick="hideItemForm()">Hide Form</button>
+  </div>
+</div>
+
+
+  <!-- Date Filter in its own wrapper below dropdown -->
+  <div id="dateFilterWrapper" style="display:none; text-align:center; margin-top:15px; padding:10px; border:1px solid #ccc; border-radius:6px; background:#f9f9f9; max-width:200px; margin-left:auto; margin-right:auto;">
+    <label style="margin-right:5px;">From: <input type="date" id="filterStartDate" style="padding:5px; border-radius:4px; color:#2c3e50"></label>
+    <label style="margin-right:5px;">To: <input type="date" id="filterEndDate" style="padding:5px; border-radius:4px; color:#2c3e50"></label>
+    <button onclick="filterByDateRange()" style="padding:5px 12px; margin-right:5px; cursor:pointer; border-radius:4px; background:#2c3e50; color:white; border:none;">Filter</button>
+    <button onclick="clearDateFilter()" style="padding:5px 12px; cursor:pointer; border-radius:4px; background:#e74c3c; color:white; border:none;">Clear</button>
+  </div>
+
+<!-- DB Table -->
+<div id="dbTableWrapper" class="table-container" style="display:none;">
+  <table id="dbTable">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Time</th>
+        <th>DR./PO No.</th>
+        <th>RR No.</th>
+        <th>Supplier / Origin</th>
+        <th>WS/DR No.</th>
+        <th>Issued To</th>
+        <th>Purpose / Location Use</th>
+        <th>In</th>
+        <th>Out</th>
+        <th>Balance</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+<div id="downloadWrapper" style="text-align:center; margin-top:10px; display:none;">
+  <button class="toggle-form-btn small-btn" onclick="downloadDBTable()">Download Stock Cards</button>
+</div>
+
+
+</main>
+
+<footer class="footer">
+  <p>&copy; Kurth Clarenze Lacsinto Novesteras. All rights reserved.</p>
+</footer>
+
+<script>
+// storage keys
+let STCard = JSON.parse(localStorage.getItem("STCard")) || [];         // [{site}]
+let StockItems = JSON.parse(localStorage.getItem("StockItems")) || []; // [{site, item}]
+
+
+// ---------------- DATE RANGE FILTER ----------------
+function filterByDateRange() {
+  const start = document.getElementById("filterStartDate").value;
+  const end = document.getElementById("filterEndDate").value;
+
+  const startDate = start ? new Date(start) : null;
+  const endDate = end ? new Date(end) : null;
+
+  const rows = document.querySelectorAll("#dbTable tbody tr");
+
+  rows.forEach(row => {
+    const dateCell = row.querySelector("td:first-child");
+    if (!dateCell) return;
+
+    const rowDate = new Date(dateCell.dataset.raw || dateCell.textContent);
+    rowDate.setHours(0,0,0,0);  // normalize to just the date
+    if (startDate) startDate.setHours(0,0,0,0);
+    if (endDate) endDate.setHours(0,0,0,0);
+
+    let show = true;
+    if (startDate && rowDate < startDate) show = false;
+    if (endDate && rowDate > endDate) show = false;
+
+    row.style.display = show ? "" : "none";
+  });
+}
+
+
+function clearDateFilter() {
+  document.getElementById("filterStartDate").value = "";
+  document.getElementById("filterEndDate").value = "";
+
+  const rows = document.querySelectorAll("#dbTable tbody tr");
+  rows.forEach(row => {
+    row.style.display = ""; // show all rows again
+  });
+}
+
+
+// ---------------- DATE FORMAT HELPER ----------------
+function formatDate(inputDate) {
+  if (!inputDate) return "";
+
+  const date = new Date(inputDate);
+  const day = date.getDate();
+  const year = date.getFullYear();
+
+  const months = [
+    "Jan.", "Feb.", "Mar.", "Apr.", "May", "June", "July",
+    "Aug.", "Sept.", "Oct.", "Nov.", "Dec."
+  ];
+
+  const month = months[date.getMonth()]; // force custom month names
+
+  return `${month} ${day}, ${year}`;
+}
+
+function formatTimeToAMPM(time24) {
+  if (!time24) return "";
+  let [hour, minute] = time24.split(":").map(Number);
+  const ampm = hour >= 12 ? "PM" : "AM";
+  hour = hour % 12;
+  if (hour === 0) hour = 12;
+  return `${hour}:${minute.toString().padStart(2,"0")} ${ampm}`;
+}
+
+function parseDateTime(record) {
+  if (!record.date || !record.time) return new Date(0); // fallback
+  // record.date is like "Sep 26, 2025"
+  // record.time is like "3:45 PM"
+  return new Date(record.date + " " + record.time);
+}
+
+// ---------------- Site functions ----------------
+function postsite() {
+    const site = document.getElementById("siteLocation").value.trim();
+    if (!site) {
+        alert("Please enter a Location / Site before submitting.");
+        return;
+    }
+    // prevent duplicate exact site names
+    if (STCard.some(s => s.site.toLowerCase() === site.toLowerCase())) {
+        alert("Site already exists.");
+        return;
+    }
+    STCard.push({ site });
+    localStorage.setItem("STCard", JSON.stringify(STCard));
+    alert("Location saved: " + site);
+    document.getElementById("siteLocation").value = "";
+    hideSiteForm();
+    populateStockSites(); // refresh dropdown when new site added
+}
+
+function hideStockTable() {
+  document.getElementById("viewStockTableWrapper").style.display = "none"; // hide View Stock Cards table
+  document.getElementById("dbTableWrapper").style.display = "none"; // hide per-item DB table if open
+  document.getElementById("downloadWrapper").style.display = "none"; // hide download button
+  document.getElementById("dateFilterWrapper").style.display = "none";
+
+}
+
+
+function hideSiteForm(){
+    document.getElementById("addsiteFormWrapper").style.display = "none";
+}
+function showSiteForm(){
+    document.getElementById("addsiteFormWrapper").style.display = "block";
+}
+
+// ---------------- Stock area functions ----------------
+function toggleStockArea() {
+  const area = document.getElementById("stockArea");
+  if (area.style.display === "flex" || area.style.display === "block") {
+    area.style.display = "none";
+    // hide internal rows
+    document.getElementById("itemRow").style.display = "none";
+    // reset selection
+    document.getElementById("stockSiteDropdown").selectedIndex = 0;
+  } else {
+    area.style.display = "flex";
+    populateStockSites();
+  }
+}
+
+function populateStockSites() {
+  const dropdown = document.getElementById("stockSiteDropdown");
+  dropdown.innerHTML = "";
+
+  if (!STCard || STCard.length === 0) {
+    const opt = document.createElement("option");
+    opt.textContent = "-- No sites available (add one) --";
+    opt.disabled = true;
+    opt.selected = true;
+    dropdown.appendChild(opt);
+    // ensure item row hidden
+    document.getElementById("itemRow").style.display = "none";
+    return;
+  }
+
+  // placeholder
+  const placeholder = document.createElement("option");
+  placeholder.textContent = "-- Select Location --";
+  placeholder.value = "";
+  placeholder.selected = true;
+  placeholder.disabled = true;
+  dropdown.appendChild(placeholder);
+
+  STCard.forEach(entry => {
+    const opt = document.createElement("option");
+    opt.value = entry.site;
+    opt.textContent = entry.site;
+    dropdown.appendChild(opt);
+  });
+
+  // hide item row until user selects a site
+  document.getElementById("itemRow").style.display = "none";
+  // reset item dropdown
+  const itemD = document.getElementById("itemDropdown");
+  itemD.innerHTML = '<option value="">-- No items yet --</option>';
+}
+
+function onSiteSelected() {
+  const site = document.getElementById("stockSiteDropdown").value;
+  const itemDropdown = document.getElementById("itemDropdown");
+  
+  if (!site) {
+    document.getElementById("itemRow").style.display = "none";
+    document.getElementById("dbTableWrapper").style.display = "none"; // hide table
+    document.getElementById("downloadWrapper").style.display = "none"; // hide download
+    return;
+  }
+
+  // show the item row and populate items for this site
+  document.getElementById("itemRow").style.display = "flex";
+  populateItemsForSite(site);
+
+  // also hide table & download initially until item is selected
+  document.getElementById("dbTableWrapper").style.display = "none";
+  document.getElementById("downloadWrapper").style.display = "none";
+  itemDropdown.selectedIndex = 0; // reset item
+}
+
+
+function populateItemsForSite(site) {
+  const itemD = document.getElementById("itemDropdown");
+  itemD.innerHTML = "";
+
+  const items = StockItems.filter(s => s.site === site).map(s => s.item);
+
+  if (!items || items.length === 0) {
+    const opt = document.createElement("option");
+    opt.textContent = "-- No items yet --";
+    opt.value = "";
+    opt.disabled = true;
+    opt.selected = true;
+    itemD.appendChild(opt);
+  } else {
+    const placeholder = document.createElement("option");
+    placeholder.textContent = "-- Select Item --";
+    placeholder.value = "";
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    itemD.appendChild(placeholder);
+
+    items.forEach(it => {
+      const o = document.createElement("option");
+      o.value = it;
+      o.textContent = it;
+      itemD.appendChild(o);
+    });
+  }
+}
+
+// ---------------- Action buttons ----------------
+function onAddItem() {
+  document.getElementById("addItemFormWrapper").style.display = "block";
+}
+
+function hideItemForm() {
+  document.getElementById("addItemFormWrapper").style.display = "none";
+}
+
+function postItem() {
+  const site = document.getElementById("stockSiteDropdown").value;
+  if (!site) {
+    alert("Please select a location first.");
+    return;
+  }
+
+    const item = document.getElementById("itemName").value.trim();
+  if (!item) {
+    alert("Please enter an item name.");
+    return;
+  }
+
+  // save to localStorage
+  StockItems.push({ site, item });
+  localStorage.setItem("StockItems", JSON.stringify(StockItems));
+
+  document.getElementById("itemName").value = ""; // clear input
+  hideItemForm();
+  populateItemsForSite(site); // refresh item dropdown
+  alert("Item added to " + site + ".");
+}
+
+
+
+function onViewDB() {
+  const site = document.getElementById("stockSiteDropdown").value;
+  const item = document.getElementById("itemDropdown").value;
+
+  if (!site || !item) return alert("Please select a site and an item first.");
+
+  const key = site + "_" + item + "_records";
+  const records = JSON.parse(localStorage.getItem(key)) || [];
+
+  // Sort by date & time (newest first)
+  records.sort((a, b) => parseDateTime(a) - parseDateTime(b));
+
+  let tbody = document.querySelector("#dbTable tbody");
+  tbody.innerHTML = "";
+
+  let balance = 0;
+  records.forEach((rec, index) => {
+    balance += rec.in - rec.out;
+    const row = `
+      <tr>
+        <td>${rec.date}</td>
+        <td>${rec.time || ""}</td>
+        <td>${rec.drpo}</td>
+        <td>${rec.rrno}</td>
+        <td>${rec.supplier}</td>
+        <td>${rec.wsdr}</td>
+        <td>${rec.issuedto}</td>
+        <td>${rec.purpose}</td>
+        <td>${rec.in}</td>
+        <td>${rec.out}</td>
+        <td>${balance}</td>
+        <td>
+          <button onclick="deleteRecord('${key}', ${index})">Delete</button>
+        </td>
+      </tr>
+    `;
+    tbody.innerHTML += row;
+  });
+
+  document.getElementById("dbTableWrapper").style.display = "block";
+  document.getElementById("dbTable").style.display = "table";
+  document.getElementById("dateFilterWrapper").style.display = "block";
+
+}
+
+
+
+
+
+function onDeleteSite() {
+  const site = document.getElementById("stockSiteDropdown").value;
+  if (!site) return alert("Please select a location first.");
+  if (!confirm(`Delete site "${site}" and all its items? This cannot be undone.`)) return;
+  // remove site
+  STCard = STCard.filter(s => s.site !== site);
+  localStorage.setItem("STCard", JSON.stringify(STCard));
+  // remove items for site
+  StockItems = StockItems.filter(s => s.site !== site);
+  localStorage.setItem("StockItems", JSON.stringify(StockItems));
+  alert(`Site "${site}" and its items deleted.`);
+  // refresh UI
+  populateStockSites();
+}
+
+function onDeleteItem() {
+  const site = document.getElementById("stockSiteDropdown").value;
+  const item = document.getElementById("itemDropdown").value;
+
+  if (!site) {
+    alert("Please select a site first.");
+    return;
+  }
+  if (!item) {
+    alert("Please select an item to delete.");
+    return;
+  }
+
+  if (!confirm(`Are you sure you want to delete the item "${item}" from site "${site}"?`)) {
+    return;
+  }
+
+  // Remove from StockItems array
+  StockItems = StockItems.filter(s => !(s.site === site && s.item === item));
+  localStorage.setItem("StockItems", JSON.stringify(StockItems));
+
+  alert(`Item "${item}" deleted from site "${site}".`);
+
+  // Refresh dropdown
+  populateItemsForSite(site);
+
+  // Hide tables and buttons since item no longer exists
+  document.getElementById("dbTableWrapper").style.display = "none";
+  document.getElementById("downloadWrapper").style.display = "none";
+  document.getElementById("dateFilterWrapper").style.display = "none";
+  document.getElementById("itemActionButtons").style.display = "none";
+}
+
+
+// ---------------- View Stock Cards top button (simple) ----------------
+function viewStockCards() {
+  // show the table immediately
+  const wrapper = document.getElementById("viewStockTableWrapper");
+  wrapper.style.display = "block";
+
+  // hide main DB table if visible
+  document.getElementById("dbTableWrapper").style.display = "none";
+
+  const tbody = document.querySelector("#viewStockTable tbody");
+  tbody.innerHTML = ""; // clear previous content
+
+  // if no sites yet
+  if (!STCard || STCard.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="13">No sites/items added yet.</td></tr>`;
+    return;
+  }
+
+  // loop through sites
+  STCard.forEach(siteEntry => {
+    const site = siteEntry.site;
+    const items = StockItems.filter(i => i.site === site).map(i => i.item);
+
+    if (!items || items.length === 0) {
+      tbody.innerHTML += `<tr><td colspan="13">No items added for site "${site}".</td></tr>`;
+    }
+
+    items.forEach(item => {
+      const key = `${site}_${item}_records`;
+      const records = JSON.parse(localStorage.getItem(key)) || [];
+
+      if (!records || records.length === 0) {
+        tbody.innerHTML += `<tr><td colspan="13">No records for "${item}" in site "${site}".</td></tr>`;
+      } else {
+        let balance = 0;
+        records.sort((a, b) => parseDateTime(a) - parseDateTime(b));
+        records.forEach(rec => {
+          balance += (rec.in || 0) - (rec.out || 0);
+          tbody.innerHTML += `
+            <tr>
+              <td>${site}</td>
+              <td>${item}</td>
+              <td>${rec.date || ""}</td>
+              <td>${rec.time || ""}</td>
+              <td>${rec.drpo || ""}</td>
+              <td>${rec.rrno || ""}</td>
+              <td>${rec.supplier || ""}</td>
+              <td>${rec.wsdr || ""}</td>
+              <td>${rec.issuedto || ""}</td>
+              <td>${rec.purpose || ""}</td>
+              <td>${rec.in || 0}</td>
+              <td>${rec.out || 0}</td>
+              <td>${balance}</td>
+            </tr>
+          `;
+        });
+      }
+    });
+  });
+}
+
+
+function onItemSelected() {
+  const site = document.getElementById("stockSiteDropdown").value;
+  const item = document.getElementById("itemDropdown").value;
+  const buttons = document.getElementById("itemActionButtons");
+  const downloadWrapper = document.getElementById("downloadWrapper");
+  
+  if (site && item) {
+    buttons.style.display = "flex";
+    document.getElementById("dbTableWrapper").style.display = "block"; // show table
+    downloadWrapper.style.display = "block"; // show download button
+    onViewDB(); // populate table
+  } else {
+    buttons.style.display = "none";
+    document.getElementById("dbTableWrapper").style.display = "none"; // hide table
+    downloadWrapper.style.display = "none"; // hide download button
+  }
+}
+
+
+
+
+function saveRecord(site, item, data) {
+  const key = `${site}_${item}_records`;
+  const records = JSON.parse(localStorage.getItem(key)) || [];
+  records.push(data);
+  localStorage.setItem(key, JSON.stringify(records));
+}
+
+function onReceiving() {
+  document.getElementById("issuanceFormWrapper").style.display = "none"; // hide issuance if open
+  document.getElementById("receivingFormWrapper").style.display = "block";
+}
+
+function onReceivingSubmit() {
+  const site = document.getElementById("stockSiteDropdown").value;
+  const item = document.getElementById("itemDropdown").value;
+
+  const data = {
+    date: document.getElementById("recDate").value,
+    drpo: document.getElementById("recDRPO").value,
+    rrno: document.getElementById("recRR").value,
+    supplier: document.getElementById("recSupplier").value,
+    in: parseInt(document.getElementById("recQty").value) || 0,
+    out: 0
+  };
+
+  saveRecord(site, item, data);
+  alert("Receiving saved!");
+  document.getElementById("receivingFormWrapper").style.display = "none";
+}
+
+function onIssuance() {
+  document.getElementById("receivingFormWrapper").style.display = "none"; // hide receiving if open
+  document.getElementById("issuanceFormWrapper").style.display = "block";
+}
+
+function onIssuanceSubmit() {
+  const site = document.getElementById("stockSiteDropdown").value;
+  const item = document.getElementById("itemDropdown").value;
+
+  const data = {
+    date: document.getElementById("issDate").value,
+    wsdr: document.getElementById("issWS").value,
+    issuedto: document.getElementById("issIssuedTo").value,
+    purpose: document.getElementById("issPurpose").value,
+    in: 0,
+    out: parseInt(document.getElementById("issQty").value) || 0
+  };
+
+  saveRecord(site, item, data);
+  alert("Issuance saved!");
+  document.getElementById("issuanceFormWrapper").style.display = "none";
+}
+
+function hideReceivingForm() {
+  document.getElementById("receivingFormWrapper").style.display = "none";
+}
+
+function hideIssuanceForm() {
+  document.getElementById("issuanceFormWrapper").style.display = "none";
+}
+
+// sample submit handlers
+function submitReceiving() {
+  const site = document.getElementById("stockSiteDropdown").value;
+  const item = document.getElementById("itemDropdown").value;
+  if (!site || !item) return alert("Please select a site and an item first.");
+
+  const time24 = document.getElementById("receivingTime").value;
+
+  const data = {
+    date: formatDate(document.getElementById("receivingDate").value),
+    time: formatTimeToAMPM(time24),  // ✅ convert to AM/PM
+    drpo: document.getElementById("receivingDRPO").value,
+    rrno: document.getElementById("receivingRR").value,
+    supplier: document.getElementById("receivingSupplier").value,
+    wsdr: "",
+    issuedto: "",
+    purpose: "",
+    in: parseInt(document.getElementById("receivingQty").value) || 0,
+    out: 0
+  };
+
+  saveRecord(site, item, data);
+  alert("Receiving saved!");
+  document.getElementById("receivingFormWrapper").style.display = "none";
+  document.getElementById("receivingForm").reset();
+}
+
+// ---------------- SAVE ISSUANCE ----------------
+function submitIssuance() {
+  const site = document.getElementById("stockSiteDropdown").value;
+  const item = document.getElementById("itemDropdown").value;
+  if (!site || !item) return alert("Please select a site and an item first.");
+
+  const time24 = document.getElementById("issuanceTime").value;
+
+  const data = {
+    date: formatDate(document.getElementById("issuanceDate").value),
+    time: formatTimeToAMPM(time24),  // ✅ convert to AM/PM
+    drpo: "",
+    rrno: "",
+    supplier: "",
+    wsdr: document.getElementById("issuanceDR").value,
+    issuedto: document.getElementById("issuanceTo").value,
+    purpose: document.getElementById("issuancePurpose").value,
+    in: 0,
+    out: parseInt(document.getElementById("issuanceQty").value) || 0
+  };
+
+  saveRecord(site, item, data);
+  alert("Issuance saved!");
+  document.getElementById("issuanceFormWrapper").style.display = "none";
+  document.getElementById("issuanceForm").reset();
+}
+
+function deleteRecord(key, idx) {
+  const records = JSON.parse(localStorage.getItem(key)) || [];
+  if (!confirm("Delete this record?")) return;
+  records.splice(idx, 1);
+  localStorage.setItem(key, JSON.stringify(records));
+  onViewDB(); // refresh table
+}
+
+
+function downloadDBTable() {
+  const site = document.getElementById("stockSiteDropdown").value;
+  const item = document.getElementById("itemDropdown").value;
+
+  if (!site || !item) return alert("Please select a site and an item first.");
+
+  let rows = Array.from(document.querySelectorAll("#dbTable tbody tr"));
+  rows = rows.filter(row => row.style.display !== "none"); // only visible rows
+
+  // create worksheet data
+  const data = [
+    [],
+    [],
+    [],
+    [],
+    ["Item Description", item, "", "", ""], // merged B1:E1
+    ["Location", site, "", "", ""],         // merged B2:E2
+    [],
+    [],
+    ["Date", "DR./PO No.", "RR No.", "Supplier / Origin", "WS/DR No.", "Issued To", "Purpose / Location Use", "In", "Out", "Balance"]
+  ];
+
+  // add visible table rows
+rows.forEach(row => {
+  const cells = row.querySelectorAll("td");
+  const rowData = Array.from(cells)
+    .filter((td, idx) => idx !== 1 && idx < 11) // remove Time column, keep relevant columns
+    .map(td => td.textContent);
+  data.push(rowData); // ✅ push the row into data
+});
+
+
+  const ws = XLSX.utils.aoa_to_sheet(data);
+
+  // define merged cells
+  ws['!merges'] = [
+    { s: { r: 4, c: 1 }, e: { r: 4, c: 4 } }, // B5:E5 (Item Description)
+    { s: { r: 5, c: 1 }, e: { r: 5, c: 4 } }  // B6:E6 (Location)
+  ];
+
+  // set column widths
+  ws['!cols'] = [
+    { wch: 16 }, // Date
+    { wch: 15 }, // DR./PO No.
+    { wch: 8 },  // RR No.
+    { wch: 20 }, // Supplier / Origin
+    { wch: 12 }, // WS/DR No.
+    { wch: 15 }, // Issued To
+    { wch: 25 }, // Purpose / Location Use
+    { wch: 10 }, // In
+    { wch: 10 }, // Out
+    { wch: 12 }, // Balance
+  ];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Stock Cards");
+  XLSX.writeFile(wb, `${site}_${item}_StockCards.xlsx`);
+}
+
+
+
+
+
+
+
+
+// ---------------- Auth Link Update ----------------
+const authLink=document.getElementById("authLink");
+function updateAuthUI(){
+    const isLoggedIn=localStorage.getItem("isLoggedIn")==="true";
+    if(isLoggedIn){ 
+        authLink.textContent="Logout"; 
+        authLink.onclick=()=>{ if(confirm("Logout?")){localStorage.removeItem("isLoggedIn");window.location.href="../../login.html";} }; 
+    } else { 
+        authLink.textContent="Login"; 
+        authLink.onclick=()=>{window.location.href="../../login.html";}; 
+    }
+}
+
+window.onload = () => {
+  updateAuthUI();
+};
+</script>
+</body>
+</html>

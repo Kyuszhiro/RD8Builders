@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Operators Salary</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    /* ✅ Retained ALL your styles */
+    * { box-sizing: border-box; }
+    html, body { height: 100%; display: flex; flex-direction: column; font-family: 'Montserrat', sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+    main { flex: 1; }
+    nav { background-color: #2c3e50; padding: 15px 25px; color: white; }
+    .nav-container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+    .logo { font-size: 20px; font-weight: 700; color: white; }
+    .nav-links { display: flex; flex-wrap: wrap; gap: 15px; }
+    .nav-item, .nav-item-button { color: white; text-decoration: none; font-size: 16px; padding: 10px 15px; background: none; border: none; border-radius: 6px; cursor: pointer; }
+    .nav-item:hover, .nav-item-button:hover { background-color: white; color: #2c3e50; }
+    .menu-toggle { display: none; flex-direction: column; cursor: pointer; margin-left: auto; gap: 4px; }
+    .menu-toggle span { height: 3px; width: 25px; background: white; border-radius: 3px; }
+    .nav-links.show { display: flex; flex-direction: column; width: 100%; margin-top: 10px; }
+    @media (max-width: 768px) { .menu-toggle { display: flex; } .nav-links { display: none; flex-direction: column; width: 100%; margin-top: 10px; } .nav-item { width: 100%; padding: 10px 0; } }
+    .back-button { display: block; margin: 10px 20px 0; text-align: left; background-color: #2c3e50; color: white; padding: 10px 25px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; text-decoration: none; width: fit-content; }
+    .back-button:hover { background-color: #34495e; }
+    h1 { text-align: center; color: #2c3e50; font-size: 24px; margin-top: 20px; }
+    .form-container { background: #2c3e50; color: white; max-width: 900px; margin: 20px auto; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; font-weight: bold; margin-bottom: 5px; }
+    input { width: 100%; padding: 10px; border: none; border-radius: 6px; font-size: 14px; }
+    .button-wrapper { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+    .button-wrapper button { background-color: #ffffff; color: #2c3e50; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; max-width: 150px; width: 100%; }
+    .button-wrapper button:hover { background-color: #ddd; }
+    .table-wrapper { overflow-x: auto; overflow-y: auto; margin: 30px auto; max-width: 1300px; max-height: 500px; border: 1px solid #ccc; }
+    table { width: 100%; border-collapse: collapse; min-width: 800px; background-color: white; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; font-size: 14px; }
+    th { background-color: #2c3e50; color: white; }
+    td[contenteditable="true"] { background-color: white; }
+    td.editing { outline: 2px solid #3498db; }
+    .footer { background-color: #2c3e50; color: white; text-align: center; padding: 15px 20px; margin-top: 40px; }
+    input:disabled, button:disabled { background-color: #ccc; color: #555; cursor: not-allowed; opacity: 0.6; }
+    .sort-button { background-color: #2c3e50; color: white; border: none; border-radius: 6px; padding: 8px 15px; cursor: pointer; margin: 0 5px; }
+    .sort-button:hover { background-color: #34495e; }
+    .grand-total-row td { font-size: 16px; padding: 12px; }
+    
+      .filter-container {
+  background: #ffffff;
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  align-items: center;
+}
+
+.filter-container label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  color: #2c3e50;
+  font-size: 14px;
+  
+}
+
+.filter-container input {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-top: 5px;
+  
+}.filter-container {
+  background: #ffffff;
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  align-items: center;
+}
+
+.filter-container label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  color: #2c3e50;
+  font-size: 14px;
+  
+}
+
+.filter-container input {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-top: 5px;
+}
+  </style>
+  <script>
+  // ---------------- LOGIN ENFORCEMENT ----------------
+  (function enforceLogin() {
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  const userRole = localStorage.getItem("userRole");
+
+  if (!isLoggedIn || (userRole !== "master" && userRole !== "logistics")) {
+    // Show white background instantly
+    document.documentElement.innerHTML = '<body style="background:#fff; margin:0"></body>';
+    
+    // Redirect to login
+    window.location.replace("../../login.html");
+  }
+})();
+</script>
+</head>
+<body>
+<main>
+<header>
+<nav>
+  <div class="nav-container">
+    <div class="logo">RD8 BUILDERS CORP</div>
+    <div class="menu-toggle" id="menu-toggle"><span></span><span></span><span></span></div>
+    <div class="nav-links" id="nav-links">
+      <a href="../../Index.html" class="nav-item">Home</a>
+      <a href="../../AboutUs.html" class="nav-item">About Us</a>
+      <a href="../../CompanyProfile.html" class="nav-item">Company Profile</a>
+      <a href="../../ContactUs.html" class="nav-item">Contact Us</a>
+      <a href="#" class="nav-item" id="authLink">Login</a>
+    </div>
+  </div>
+</nav>
+<a class="back-button" href="Logistics.html">← Back to Logistics</a>
+</header>
+
+<h1>OPERATORS SALARY</h1>
+
+<!-- ✅ Encoding Form -->
+<div class="form-container">
+  <div class="form-group">
+  <label>Start Date:</label>
+  <input type="date" id="startDate">
+</div>
+<div class="form-group">
+  <label>End Date:</label>
+  <input type="date" id="endDate">
+</div>
+  <div class="form-group"><label>Operator:</label><input type="text" id="operator"></div>
+  <div class="form-group"><label>Equipment Code:</label><input type="text" id="equipment"></div>
+  <div class="form-group"><label>Days Worked:</label><input type="number" id="daysWorked"></div>
+  <div class="form-group"><label>Basic Rate:</label><input type="number" id="basicRate"></div>
+  <div class="form-group"><label>Allowance:</label><input type="number" id="allowance"></div>
+  <div class="form-group"><label>Additional Allowance:</label><input type="number" id="addAllowance"></div>
+  <div class="form-group"><label>Overtime (hrs):</label><input type="number" id="overtime"></div>
+
+  <div class="button-wrapper">
+    <button onclick="postDetails()">Submit</button>
+    <button onclick="toggleEditMode()">Edit Mode</button>
+  </div>
+</div>
+
+<div class="filter-container">
+  <label>Start Date
+  <input type="date" id="filterStartDate" onchange="applyFilters()">
+</label>
+<label>End Date
+  <input type="date" id="filterEndDate" onchange="applyFilters()">
+</label>
+  <label>Operator
+    <input type="text" id="filterOperator" oninput="applyFilters()" placeholder="Type Operator">
+  </label>
+  <label>Equipment
+    <input type="text" id="filterEquipment" oninput="applyFilters()" placeholder="Type Equipment">
+  </label>
+  
+
+  <button onclick="clearFilters()" class="sort-button">Clear Filters</button>
+</div>
+
+<!-- ✅ Post Table -->
+<div class="table-wrapper">
+  <table>
+    <thead>
+      <tr>
+        <th>Date Range</th>
+        <th>Operator</th>
+        <th>Equipment Code</th>
+        <th>Days Worked</th>
+        <th>Basic Rate</th>
+        <th>Allowance</th>
+        <th>Additional Allowance</th>
+        <th>Overtime</th>
+        <th>Remove</th>
+      </tr>
+    </thead>
+    <tbody id="dataBody"></tbody>
+  </table>
+</div>
+
+<!-- ✅ Generate Summary -->
+<div style="text-align:center; margin: 20px;">
+  <button onclick="generateSummary()" style="background-color: #27ae60;color: white;padding: 10px 20px;border: none;border-radius: 6px;cursor: pointer;font-size: 16px;">Generate Summary Report</button>
+</div>
+
+<div class="table-wrapper" id="summaryWrapper" style="display:none;">
+  <h2 style="text-align:center; color:#2c3e50;">Summary Report</h2>
+  <table id="summaryTable">
+    <thead>
+  <tr>
+    <th>Date Range</th>
+    <th>Operator</th>
+    <th>Equipment Code</th> <!-- ✅ new -->
+    <th>Days Worked</th>
+    <th>Basic Rate</th>
+    <th>Total</th>
+    <th>Allowance</th>
+    <th>Additional Allowance</th>
+    <th>Total Gross</th>
+    <th>Overtime</th>
+    <th>Overtime Total Pay</th>
+    <th>Net Pay</th>
+  </tr>
+</thead>
+    <tbody></tbody>
+    <tfoot>
+      <tr class="grand-total-row">
+        <td colspan="10" style="background:#2c3e50;color:white;font-weight:bold;text-align:center;">Grand Total</td>
+        <td id="grandTotalNetpay" style="background:#27ae60;color:white;font-weight:bold;"></td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+
+<div style="text-align:center; margin: 10px;">
+  <button id="downloadSummaryBtn" onclick="downloadSummary()" style="background-color: #2980b9;color: white;padding: 10px 20px;border: none;border-radius: 6px;cursor: pointer;font-size: 16px;display: none;">Download Summary Report</button>
+</div>
+
+</main>
+
+<footer class="footer">
+  <p>&copy; Kurth Clarenze Lacsinto Novesteras. All rights reserved.</p>
+</footer>
+
+<!-- ✅ Script part will handle salary computation -->
+<script>
+
+let entries = JSON.parse(localStorage.getItem("salaryEntries") || "[]");
+let editingEnabled = false;
+
+function save(){ localStorage.setItem("salaryEntries", JSON.stringify(entries)); }
+
+function postDetails() {
+  const entry = {
+    startDate: startDate.value,
+    endDate: endDate.value,
+    dateRange: startDate.value && endDate.value ? `${startDate.value} - ${endDate.value}` : "",
+    operator: operator.value.trim().toUpperCase(),   // ✅ force uppercase
+    equipment: equipment.value.trim().toUpperCase(), // ✅ force uppercase
+    daysWorked: Number(daysWorked.value),
+    basicRate: Number(basicRate.value),
+    allowance: Number(allowance.value),
+    addAllowance: Number(addAllowance.value),
+    overtime: Number(overtime.value)
+  };
+
+  if(!entry.startDate || !entry.endDate || !entry.operator){ 
+    alert("Fill required fields"); 
+    return; 
+  }
+
+  entries.push(entry);
+  save();
+  updateTable();
+
+  document.querySelectorAll(".form-container input").forEach(i=>i.value="");
+}
+
+
+
+function updateTable() {
+  const body = document.getElementById("dataBody");
+  body.innerHTML = "";
+
+  // ✅ Get active filters
+  const fStart = document.getElementById("filterStartDate").value;
+  const fEnd   = document.getElementById("filterEndDate").value;
+  const fOperator = document.getElementById("filterOperator").value.trim().toUpperCase();
+  const fEquip = document.getElementById("filterEquipment").value.trim().toUpperCase();
+
+  // ✅ Filter entries
+  const filtered = entries.filter(e=>{
+    let pass = true;
+    if(fStart && e.startDate < fStart) pass = false;
+    if(fEnd && e.endDate > fEnd) pass = false;
+    if(fOperator && !e.operator.includes(fOperator)) pass = false;
+    if(fEquip && !e.equipment.includes(fEquip)) pass = false;
+    return pass;
+  });
+
+  filtered.forEach((e,i)=>{
+    const row = document.createElement("tr");
+    ["dateRange","operator","equipment","daysWorked","basicRate","allowance","addAllowance","overtime"].forEach(key=>{
+      const td=document.createElement("td");
+      td.textContent=e[key];
+      if(editingEnabled){ 
+        td.contentEditable=true; 
+        td.classList.add("editing"); 
+        td.oninput=()=>{ entries[i][key]=td.textContent; save(); }; 
+      }
+      row.appendChild(td);
+    });
+
+    const tdRemove=document.createElement("td");
+    const btn=document.createElement("button");
+    btn.textContent="Remove";
+    btn.style.background="#e74c3c"; 
+    btn.style.color="white";
+    btn.onclick=()=>{
+      const index = entries.indexOf(e);
+      if(index>-1){ entries.splice(index,1); save(); updateTable(); }
+    };
+    tdRemove.appendChild(btn);
+    row.appendChild(tdRemove);
+
+    body.appendChild(row);
+  });
+}
+
+function applyFilters(){ updateTable(); }
+
+function clearFilters(){
+  document.getElementById("filterStartDate").value="";
+  document.getElementById("filterEndDate").value="";
+  document.getElementById("filterOperator").value="";
+  document.getElementById("filterEquipment").value="";
+  updateTable();
+}
+function toggleEditMode(){ editingEnabled=!editingEnabled; updateTable(); }
+
+// --- replace the existing generateSummary() with this (only difference: store lastFilteredEntries) ---
+function generateSummary(){
+  const tbody = document.querySelector("#summaryTable tbody");
+  tbody.innerHTML="";
+
+  // ✅ Collect filters
+  const fStart = document.getElementById("filterStartDate").value;
+  const fEnd   = document.getElementById("filterEndDate").value;
+  const fOperator = document.getElementById("filterOperator").value.trim().toUpperCase();
+  const fEquip = document.getElementById("filterEquipment").value.trim().toUpperCase();
+
+  // ✅ Apply filters to entries
+  const filtered = entries.filter(e=>{
+    let pass = true;
+    if(fStart && e.startDate < fStart) pass = false;
+    if(fEnd && e.endDate > fEnd) pass = false;
+    if(fOperator && !e.operator.includes(fOperator)) pass = false;
+    if(fEquip && !e.equipment.includes(fEquip)) pass = false;
+    return pass;
+  });
+
+  // store the filtered result so download uses exactly the same data
+  window.lastFilteredEntries = filtered;
+
+  // Initialize accumulators
+  let totalTotal = 0;
+  let totalAllowance = 0;
+  let totalAddAllowance = 0;
+  let totalGross = 0;
+  let totalOvertime = 0;
+  let totalOvertimePay = 0;
+  let totalNetpay = 0;
+
+  filtered.forEach(e=>{
+    const days = Number(e.daysWorked) || 0;
+    const basic = Number(e.basicRate) || 0;
+    const allowanceN = Number(e.allowance) || 0;
+    const addAllowanceN = Number(e.addAllowance) || 0;
+    const overtimeN = Number(e.overtime) || 0;
+
+    const total = days * basic;
+    const overtimePay = (basic / 8) * 1.25 * overtimeN;
+    const gross = total + allowanceN + addAllowanceN;
+    const netpay = gross + overtimePay;
+
+    // accumulate
+    totalTotal += total;
+    totalAllowance += allowanceN;
+    totalAddAllowance += addAllowanceN;
+    totalGross += gross;
+    totalOvertime += overtimeN;
+    totalOvertimePay += overtimePay;
+    totalNetpay += netpay;
+
+    // Row
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td>${e.dateRange}</td>
+      <td>${e.operator}</td>
+      <td>${e.equipment}</td>
+      <td>${days}</td>
+      <td>${basic.toLocaleString()}</td>
+      <td>${total.toLocaleString()}</td>
+      <td>${allowanceN.toLocaleString()}</td>
+      <td>${addAllowanceN.toLocaleString()}</td>
+      <td>${gross.toLocaleString()}</td>
+      <td>${overtimeN}</td>
+      <td>${overtimePay.toLocaleString()}</td>
+      <td>${netpay.toLocaleString()}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Update footer row with all grand totals
+  document.querySelector("#summaryTable tfoot").innerHTML = `
+  <tr class="grand-total-row">
+    <td colspan="5" style="background:#2c3e50;color:white;font-weight:bold;text-align:center;">Grand Totals</td>
+    <td style="background:#2c3e50;color:white;font-weight:bold;text-align:center;">${totalTotal.toLocaleString()}</td>
+    <td style="background:#2c3e50;color:white;font-weight:bold;text-align:center;">${totalAllowance.toLocaleString()}</td>
+    <td style="background:#2c3e50;color:white;font-weight:bold;text-align:center;">${totalAddAllowance.toLocaleString()}</td>
+    <td style="background:#2c3e50;color:white;font-weight:bold;text-align:center;">${totalGross.toLocaleString()}</td>
+    <td style="background:#2c3e50;color:white;font-weight:bold;text-align:center;">${totalOvertime.toLocaleString()}</td>
+    <td style="background:#2c3e50;color:white;font-weight:bold;text-align:center;">${totalOvertimePay.toLocaleString()}</td>
+    <td style="background:#27ae60;color:white;font-weight:bold;text-align:center;">${totalNetpay.toLocaleString()}</td>
+  </tr>
+  `;
+
+  document.getElementById("summaryWrapper").style.display="block";
+  document.getElementById("downloadSummaryBtn").style.display="inline-block";
+}
+
+
+// --- replace downloadSummary() with this version (uses the filtered array) ---
+function downloadSummary() {
+  const table = document.getElementById("summaryTable");
+
+  // Convert HTML table to SheetJS worksheet
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.table_to_sheet(table);
+
+  // ✅ Column widths (still adjustable in Excel)
+  ws['!cols'] = [
+    { wch: 25 }, // Date Range
+    { wch: 20 }, // Operator
+    { wch: 20 }, // Equipment
+    { wch: 11 }, // Days Worked (D)
+    { wch: 11 }, // Basic Rate
+    { wch: 11 }, // Total
+    { wch: 11 }, // Allowance
+    { wch: 17 }, // Additional Allowance
+    { wch: 11 }, // Gross
+    { wch: 11 }, // Overtime
+    { wch: 17 }, // Overtime Pay
+    { wch: 11 }  // Netpay
+  ];
+
+  // ✅ Find last used row in worksheet
+  let range = XLSX.utils.decode_range(ws['!ref']);
+  let lastRow = range.e.r;
+
+  // add 2 empty rows
+  lastRow += 2;
+
+  // Prefer the filtered array saved by generateSummary; fallback to recomputing filters
+  const filtered = window.lastFilteredEntries || (function(){
+    const fStart = document.getElementById("filterStartDate").value;
+    const fEnd   = document.getElementById("filterEndDate").value;
+    const fOperator = document.getElementById("filterOperator").value.trim().toUpperCase();
+    const fEquip = document.getElementById("filterEquipment").value.trim().toUpperCase();
+    return entries.filter(e=>{
+      let pass = true;
+      if(fStart && e.startDate < fStart) pass = false;
+      if(fEnd && e.endDate > fEnd) pass = false;
+      if(fOperator && !e.operator.includes(fOperator)) pass = false;
+      if(fEquip && !e.equipment.includes(fEquip)) pass = false;
+      return pass;
+    });
+  })();
+
+  // ✅ Compute equipment totals only from FILTERED rows
+  const equipmentTotals = {};
+  let equipmentGrandTotal = 0;
+
+  filtered.forEach(e => {
+    const days = Number(e.daysWorked) || 0;
+    const basic = Number(e.basicRate) || 0;
+    const allowanceN = Number(e.allowance) || 0;
+    const addAllowanceN = Number(e.addAllowance) || 0;
+    const overtimeN = Number(e.overtime) || 0;
+
+    const overtimePay = (basic / 8) * 1.25 * overtimeN;
+    const netpay = (days * basic) + allowanceN + addAllowanceN + overtimePay;
+
+    const key = e.equipment || "(UNSPECIFIED)";
+    equipmentTotals[key] = (equipmentTotals[key] || 0) + netpay;
+    equipmentGrandTotal += netpay;
+  });
+
+  XLSX.utils.sheet_add_aoa(ws, [["Operators Salary Summary"]], { origin: { r: lastRow, c: 0 } });
+lastRow++;
+
+  // ✅ Add header row for Equipment Totals (filtered)
+  XLSX.utils.sheet_add_aoa(ws, [["Equipment", "Total Net Pay"]], { origin: { r: lastRow, c: 0 } });
+  lastRow++;
+
+  // ✅ Add each equipment total row (raw numbers)
+  Object.keys(equipmentTotals).forEach(eq => {
+    XLSX.utils.sheet_add_aoa(ws, [[eq, equipmentTotals[eq]]], { origin: { r: lastRow, c: 0 } });
+    lastRow++;
+  });
+
+  // ✅ Add Equipment Grand Total row
+  XLSX.utils.sheet_add_aoa(ws, [["Grand Total", equipmentGrandTotal]], { origin: { r: lastRow, c: 0 } });
+  lastRow++;
+
+  // ✅ Update worksheet range
+  ws['!ref'] = XLSX.utils.encode_range(range.s, { r: lastRow, c: range.e.c });
+
+  // ✅ Apply number formatting
+  Object.keys(ws).forEach(cell => {
+    if(cell[0] === "!") return; // skip metadata
+    const col = cell.replace(/[0-9]/g, ""); // get column letter(s)
+    const val = ws[cell].v;
+
+    if(typeof val === "number") {
+      ws[cell].t = "n";
+
+      // ✅ Days Worked (Column D) → whole numbers only
+      if(col === "D") {
+        ws[cell].v = Math.round(val);
+        ws[cell].z = "0"; // no decimals
+      } else {
+        ws[cell].z = "#,##0.00"; // keep 2 decimals for money
+      }
+    }
+  });
+
+  // Append worksheet to workbook and export
+  XLSX.utils.book_append_sheet(wb, ws, "Operators Salary");
+  XLSX.writeFile(wb, "Operators_Salary.xlsx");
+}
+
+
+
+
+const authLink=document.getElementById("authLink");
+  function updateAuthUI(){
+    const isLoggedIn=localStorage.getItem("isLoggedIn")==="true";
+    if(isLoggedIn){ authLink.textContent="Logout"; authLink.onclick=()=>{ if(confirm("Logout?")){localStorage.removeItem("isLoggedIn");window.location.href="../../login.html";} }; }
+    else { authLink.textContent="Login"; authLink.onclick=()=>{window.location.href="../../login.html";}; }
+  }
+ window.onload = () => {
+  updateTable();
+  updateAuthUI();
+};
+// Load table on page refresh
+updateTable();
+
+</script>
+</body>
+</html>

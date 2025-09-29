@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BILLING STATEMENT</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.9.0/docx.umd.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { height: 100%; display: flex; flex-direction: column; font-family: 'Montserrat', sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+    main { flex: 1; }
+    nav { background-color: #2c3e50; padding: 15px 25px; color: white; }
+    .nav-container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+    .logo { font-size: 20px; font-weight: 700; color: white; }
+    .nav-links { display: flex; flex-wrap: wrap; gap: 15px; }
+    .nav-item, .nav-item-button { color: white; text-decoration: none; font-size: 16px; padding: 10px 15px; background: none; border: none; border-radius: 6px; cursor: pointer; }
+    .nav-item:hover, .nav-item-button:hover { background-color: white; color: #2c3e50; }
+    .menu-toggle { display: none; flex-direction: column; cursor: pointer; margin-left: auto; gap: 4px; }
+    .menu-toggle span { height: 3px; width: 25px; background: white; border-radius: 3px; }
+    .nav-links.show { display: flex; flex-direction: column; width: 100%; margin-top: 10px; }
+    @media (max-width: 768px) { .menu-toggle { display: flex; } .nav-links { display: none; flex-direction: column; width: 100%; margin-top: 10px; } .nav-item { width: 100%; padding: 10px 0; } }
+    .back-button { display: block; margin: 10px 20px 0; text-align: left; background-color: #2c3e50; color: white; padding: 10px 25px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; text-decoration: none; width: fit-content; }
+    .back-button:hover { background-color: #34495e; }
+    h1 { text-align: center; color: #2c3e50; font-size: 24px; margin-top: 20px; }
+    .form-container { background: #2c3e50; color: white; max-width: 400px; margin: 20px auto; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+    .form-group { margin-bottom: 15px; }
+    
+    label { display: block; font-weight: bold; margin-bottom: 5px; }
+    input { width: 100%; padding: 10px; border: none; border-radius: 6px; font-size: 14px; }
+    .button-wrapper { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+    .button-wrapper button { background-color: #ffffff; color: #2c3e50; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; max-width: 150px; width: 100%; }
+    .button-wrapper button:hover { background-color: #ddd; }
+    .table-wrapper { overflow-x: auto; overflow-y: auto; margin: 30px auto; max-width: 1300px; max-height: 500px; border: 1px solid #ccc; }
+    table { width: 100%; border-collapse: collapse; min-width: 900px; background-color: white; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; font-size: 14px; }
+    th { background-color: #2c3e50; color: white; }
+    td[contenteditable="true"] { background-color: #f9f9f9; }
+    td.editing { outline: 2px solid #3498db; }
+    .footer { background-color: #2c3e50; color: white; text-align: center; padding: 15px 20px; margin-top: 40px; }
+    input:disabled, button:disabled { background-color: #ccc; color: #555; cursor: not-allowed; opacity: 0.6; }
+    .action-btn { margin: 2px; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; }
+    .edit-btn { background-color: #3498db; color: white; }
+    .remove-btn { background-color: #e74c3c; color: white; }
+    .save-btn { background-color: #27ae60; color: white; }
+
+    .filter-container {
+  background: #ffffff;
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  align-items: center;
+}
+
+.filter-container label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  color: #2c3e50;
+  font-size: 14px;
+  
+}
+
+.filter-container input {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.segment-range {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.segment-range input {
+  width: 100px;
+  text-align: center;
+}
+/* Yes/No button group */
+.radio-group {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.radio-btn {
+  position: relative;
+}
+
+.radio-btn input {
+  display: none; /* hide the default radio */
+}
+
+.radio-btn label {
+  display: inline-block;
+  padding: 10px 25px;
+  border: 2px solid #2c3e50;
+  border-radius: 6px;
+  font-weight: 600;
+  color: #2c3e50;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #fff;
+}
+
+.radio-btn input:checked + label {
+  background-color: #2c3e50;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.form-group label.center-label {
+  display: block;
+  text-align: center;
+  font-weight: 600;
+}
+
+
+  </style>
+
+  <script>
+  // ---------------- LOGIN ENFORCEMENT ----------------
+  (function enforceLogin() {
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  const userRole = localStorage.getItem("userRole");
+
+  if (!isLoggedIn || (userRole !== "master" && userRole !== "logistics")) {
+    // Show white background instantly
+    document.documentElement.innerHTML = '<body style="background:#fff; margin:0"></body>';
+    
+    // Redirect to login
+    window.location.replace("../../login.html");
+  }
+})();
+</script>
+</head>
+<body>
+<main>
+<header>
+<nav>
+  <div class="nav-container">
+    <div class="logo">RD8 BUILDERS CORP</div>
+    <div class="menu-toggle" id="menu-toggle"><span></span><span></span><span></span></div>
+    <div class="nav-links" id="nav-links">
+      <a href="../../Index.html" class="nav-item">Home</a>
+      <a href="../../AboutUs.html" class="nav-item">About Us</a>
+      <a href="../../CompanyProfile.html" class="nav-item">Company Profile</a>
+      <a href="../../ContactUs.html" class="nav-item">Contact Us</a>
+      <a href="#" class="nav-item" id="authLink">Login</a>
+    </div>
+  </div>
+</nav>
+<a class="back-button" href="Logistics.html">← Back to Logistics</a>
+</header>
+
+<h1>BILLING STATEMENT</h1>
+
+<div class="form-container">
+  <div class="form-group"><label>Date of Creation:</label><input type="date" id="date"></div>
+  
+  <div class="form-group">
+    <label>Date Range:</label>
+    <div style="display: flex; gap: 10px;">
+      <input type="date" id="fromDate">
+      <input type="date" id="toDate">
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Upload Equipment Rental Summary</label> 
+    <input type="file" id="excelFile" accept=".xlsx, .xls">
+  </div>
+
+<div class="form-group">
+  <label class="center-label">Will this billing have segments?</label>
+  <div class="radio-group">
+    <div class="radio-btn">
+      <input type="radio" id="segYes" name="hasSegments" value="yes" onchange="toggleSegments()">
+      <label for="segYes">Yes</label>
+    </div>
+    <div class="radio-btn">
+      <input type="radio" id="segNo" name="hasSegments" value="no" onchange="toggleSegments()">
+      <label for="segNo">No</label>
+    </div>
+  </div>
+</div>
+
+<div class="form-group" id="segmentRangeGroup" style="display: none;">
+  <label class="center-label">Enter Segment Range:</label>
+  <div class="segment-range">
+    <input type="number" id="segmentFrom" min="1" placeholder="From">
+    <span>to</span>
+    <input type="number" id="segmentTo" min="1" placeholder="To">
+  </div>
+</div>
+
+
+
+  <div class="button-wrapper">
+    <button onclick="submitBilling()">Submit</button>
+  </div>
+</div>
+
+<div class="filter-container">
+
+  <label>  Date Created
+  <input type="date" id="filterDateCreated" onchange="applyFilters()">
+  </label>
+  <label>  Date Start
+  <input type="date" id="filterStartDate" onchange="applyFilters()">
+  </label>
+<label>  Date End
+<input type="date" id="filterEndDate" onchange="applyFilters()">
+</label>
+  <label>  Project Code
+  <input type="text" id="filterProjectCode" oninput="applyFilters()" placeholder="Type Project Code">
+  </label>
+  <button onclick="clearFilters()" class="sort-button">Clear Filters</button>
+</div>
+
+
+<div class="table-wrapper">
+  <table>
+    <thead>
+      <tr>
+        <th>Date of Creation</th>
+        <th>Date Range</th>
+        <th>Project Code</th>
+        <th>No. of Segments</th>
+        <th>Previous Total Bill</th>
+        <th>Current Bill</th>
+        <th>Total Bill</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="billingBody"></tbody>
+  </table>
+</div>
+
+</main>
+
+<footer class="footer">
+  <p>&copy; Kurth Clarenze Lacsinto Novesteras. All rights reserved.</p>
+</footer>
+
+<script>
+
+function toggleSegments() {
+  const selected = document.querySelector('input[name="hasSegments"]:checked').value;
+  const rangeGroup = document.getElementById("segmentRangeGroup");
+  rangeGroup.style.display = (selected === "yes") ? "block" : "none";
+}
+
+
+// ---------------- BILLING STATEMENT STORAGE ----------------
+let billingEntries = JSON.parse(localStorage.getItem("billingStatementEntries") || "[]");
+
+function applyFilters() {
+  const dateCreated = document.getElementById("filterDateCreated").value;
+  const startDate = document.getElementById("filterStartDate").value;
+  const endDate = document.getElementById("filterEndDate").value;
+  const projectCode = document.getElementById("filterProjectCode").value.toLowerCase();
+
+  const filtered = billingEntries.filter(entry => {
+    let match = true;
+
+    if (dateCreated) {
+      match = match && entry.date === dateCreated;
+    }
+    if (startDate) {
+      match = match && new Date(entry.fromDate) >= new Date(startDate);
+    }
+    if (endDate) {
+      match = match && new Date(entry.toDate) <= new Date(endDate);
+    }
+    if (projectCode) {
+      match = match && entry.projectCode.toLowerCase().includes(projectCode);
+    }
+
+    return match;
+  });
+
+  // Render filtered results
+  const body = document.getElementById("billingBody");
+  body.innerHTML = "";
+  filtered.forEach((entry, index) => {
+    const row = `<tr>
+      <td>${entry.date}</td>
+      <td>${entry.fromDate} to ${entry.toDate}</td>
+      <td>${entry.projectCode}</td>
+      <td>${entry.segments ? entry.segments.length : "—"}</td>
+      <td>₱${entry.previousBill.toLocaleString()}</td>
+      <td>₱${entry.currentBill.toLocaleString()}</td>
+      <td>₱${entry.totalBill.toLocaleString()}</td>
+      <td>
+        <button class="action-btn remove-btn" onclick="removeEntry(${billingEntries.indexOf(entry)})">Remove</button>
+        <button class="action-btn save-btn" onclick="downloadSummary(${billingEntries.indexOf(entry)})">Download</button>
+      </td>
+    </tr>`;
+    body.insertAdjacentHTML("beforeend", row);
+  });
+}
+
+function clearFilters() {
+  document.getElementById("filterDateCreated").value = "";
+  document.getElementById("filterStartDate").value = "";
+  document.getElementById("filterEndDate").value = "";
+  document.getElementById("filterProjectCode").value = "";
+  renderTable();
+}
+
+
+function renderTable() {
+  const body = document.getElementById("billingBody");
+  body.innerHTML = "";
+  billingEntries.forEach((entry, index) => {
+    const row = `<tr>
+      <td>${entry.date}</td>
+      <td>${entry.fromDate} to ${entry.toDate}</td>
+      <td>${entry.projectCode}</td>
+      <td>${entry.segments && entry.segments.length > 0 ? entry.segments.length : "—"}</td>
+      <td>₱${entry.previousBill.toLocaleString()}</td>
+      <td>₱${entry.currentBill.toLocaleString()}</td>
+      <td>₱${entry.totalBill.toLocaleString()}</td>
+      <td>
+        <button class="action-btn remove-btn" onclick="removeEntry(${index})">Remove</button>
+        <button class="action-btn save-btn" onclick="downloadSummary(${index})">Download</button>
+      </td>
+    </tr>`;
+    body.insertAdjacentHTML("beforeend", row);
+  });
+}
+
+
+function formatSingleDate(dateStr) {
+  const options = { year: "numeric", month: "long", day: "numeric" };
+  return new Date(dateStr).toLocaleDateString("en-US", options);
+}
+
+function submitBilling() {
+  const date = document.getElementById("date").value;
+  const fromDate = document.getElementById("fromDate").value;
+  const toDate = document.getElementById("toDate").value;
+  const fileInput = document.getElementById("excelFile");
+
+  const hasSegments = document.querySelector('input[name="hasSegments"]:checked');
+
+  if (!date || !fromDate || !toDate || fileInput.files.length === 0 || !hasSegments) {
+    alert("Please fill in all fields, specify segments, and upload an Excel file.");
+    return;
+  }
+
+  // ✅ Handle segments
+  // ✅ Initialize array
+  let segments = [];
+  let from, to;
+
+  if (hasSegments.value === "yes") {
+  from = parseInt(document.getElementById("segmentFrom").value, 10);
+  to   = parseInt(document.getElementById("segmentTo").value, 10);
+
+  if (isNaN(from) || isNaN(to) || from > to) {
+    alert("Please enter a valid segment range.");
+    return;
+  }
+
+  segments = Array.from({ length: to - from + 1 }, (_, idx) => from + idx);
+}
+
+
+
+  const file = fileInput.files[0];
+  const reader = new FileReader();
+
+  reader.onload = function(e) {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+
+      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(firstSheet, { defval: "", header: 1 });
+
+      let currentBill = 0;
+      let projectCode = "UNKNOWN";
+      let breakdown = [];
+
+      // ✅ Identify columns
+      const headerRow = rows[0].map(h => String(h).toLowerCase().trim());
+      const projectCodeCol = headerRow.findIndex(h => h.includes("project code"));
+      let equipmentCol     = headerRow.findIndex(h => h.includes("equipment"));
+      if (equipmentCol === -1) {
+  equipmentCol = headerRow.findIndex(h => 
+    h.includes("description") || h.includes("particular") || h.includes("details")
+  );
+}
+
+      const amountCol      = headerRow.findIndex(h => h.includes("amount"));
+      
+
+      if (projectCodeCol === -1 || amountCol === -1) {
+        alert("Excel must have 'Project Code' and 'Amount' columns.");
+        return;
+      }
+
+      projectCode = rows[1][projectCodeCol] || "UNKNOWN";
+
+      // ✅ Collect breakdown rows until "Grand Total"
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row || row.length === 0) continue;
+
+        // Stop at "Grand Total"
+        if (String(row.join(" ")).toLowerCase().includes("grand total")) {
+          const numericValues = row
+            .map(v => String(v).replace(/,/g, ""))
+            .filter(v => !isNaN(v) && v.trim() !== "");
+          if (numericValues.length > 0) {
+            currentBill = Number(numericValues[numericValues.length - 1]) || 0;
+          }
+          break;
+        }
+
+        // Save breakdown row if both equipment + amount exist
+        if (equipmentCol !== -1 && row[equipmentCol] && row[amountCol]) {
+          breakdown.push({
+            code: row[equipmentCol],
+            amount: Number(String(row[amountCol]).replace(/,/g, "")) || 0
+          });
+        }
+      }
+
+      // ✅ Previous + Total bill
+      const lastEntry = billingEntries.filter(e => e.projectCode === projectCode).slice(-1)[0];
+      const previousBill = lastEntry ? Number(lastEntry.totalBill) || 0 : 0;
+      const totalBill = previousBill + currentBill;
+
+      
+      console.log("Segment range entered:", from, "to", to);
+      console.log("Segments generated:", segments);
+      console.log("Saving segments:", segments);
+
+      // ✅ Save entry WITH breakdown
+      billingEntries.push({
+        date,
+        fromDate,
+        toDate,
+        projectCode,
+        previousBill,
+        currentBill,
+        totalBill,
+        segments,
+        breakdown
+      });
+
+      localStorage.setItem("billingStatementEntries", JSON.stringify(billingEntries));
+      renderTable();
+
+      // Reset form
+      document.getElementById("date").value = "";
+      document.getElementById("fromDate").value = "";
+      document.getElementById("toDate").value = "";
+      fileInput.value = "";
+      document.getElementById("segmentRangeGroup").style.display = "none";
+
+    } catch (err) {
+      alert("Error reading Excel file: " + err.message);
+      console.error(err);
+    }
+  };
+
+  reader.readAsArrayBuffer(file);
+}
+
+
+
+
+
+function removeEntry(index) {
+  billingEntries.splice(index, 1);
+  localStorage.setItem("billingStatementEntries", JSON.stringify(billingEntries));
+  renderTable();
+}
+
+function numberToWords(num) {
+  const a = [
+    "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten",
+    "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen",
+    "Eighteen", "Nineteen"
+  ];
+  const b = [
+    "", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"
+  ];
+
+  function inWords(n) {
+    if (n < 20) return a[n];
+    if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? " " + a[n % 10] : "");
+    if (n < 1000) return a[Math.floor(n / 100)] + " Hundred" + (n % 100 ? " " + inWords(n % 100) : "");
+    if (n < 1000000) return inWords(Math.floor(n / 1000)) + " Thousand" + (n % 1000 ? " " + inWords(n % 1000) : "");
+    if (n < 1000000000) return inWords(Math.floor(n / 1000000)) + " Million" + (n % 1000000 ? " " + inWords(n % 1000000) : "");
+    return "";
+  }
+
+  const pesos = Math.floor(num);
+  const cents = Math.round((num - pesos) * 100);
+
+  let words = inWords(pesos) + " Pesos";
+  if (cents > 0) {
+    words += " and " + inWords(cents) + " Cents";
+  }
+  return words.toUpperCase();
+}
+
+function formatDateRange(startDate, endDate) {
+  const options = { month: "long", day: "numeric" };
+
+  let start = new Date(startDate);
+  let end = new Date(endDate);
+
+  // Same month and year → "August 11-18, 2025"
+  if (start.getFullYear() === end.getFullYear() && start.getMonth() === end.getMonth()) {
+    return `${start.toLocaleDateString("en-US", options)}–${end.getDate()}, ${end.getFullYear()}`;
+  } 
+  // Same year but different months → "August 30 – September 2, 2025"
+  else if (start.getFullYear() === end.getFullYear()) {
+    return `${start.toLocaleDateString("en-US", options)} – ${end.toLocaleDateString("en-US", options)}, ${end.getFullYear()}`;
+  } 
+  // Different years → "December 30, 2025 – January 2, 2026"
+  else {
+    return `${start.toLocaleDateString("en-US", options)}, ${start.getFullYear()} – ${end.toLocaleDateString("en-US", options)}, ${end.getFullYear()}`;
+  }
+}
+
+// Example:
+let formatted = formatDateRange("2025-08-11", "2025-08-18");
+console.log(formatted); // August 11–18, 2025
+
+function downloadSummary(index) {
+  const entry = billingEntries[index];
+      if (!entry) {
+    alert("No billing entry found.");
+    return;
+  }
+
+  // Convert current bill to words (simple function below)
+  const amountWords = toWords(entry.currentBill); // "TWENTY FOUR THOUSAND PESOS"
+  const amountNumber = entry.currentBill.toLocaleString(undefined, { style: "currency", currency: "PHP" });
+
+
+  const wsData = [];
+
+  // Header
+  wsData.push([entry.date]);
+  wsData.push([]);
+  wsData.push(["To: Finance Department"]);
+  wsData.push([]);
+  const formattedRange = formatDateRange(entry.fromDate, entry.toDate);
+
+wsData.push([
+  `This letter serves to inform of your billing statement for the week of ${formattedRange}`
+]);
+  wsData.push([`regarding the equipment you rented at ${entry.projectCode}.`]);
+  wsData.push([]);
+  wsData.push([
+  `Forwarding here with billing statement in the amount of ${amountWords} (${amountNumber})`
+]);
+wsData.push([]);
+wsData.push([]);
+
+
+  // ✅ Insert segment lines here
+  if (entry.segments && entry.segments.length > 0) {
+  const perSegment = entry.currentBill / entry.segments.length;
+
+  entry.segments
+    .map(Number)
+    .sort((a, b) => a - b)
+    .forEach(seg => {
+      wsData.push([
+        `Segment ${seg} =`,
+        perSegment.toLocaleString(undefined, { style: "currency", currency: "PHP" })
+      ]);
+    });
+}
+
+
+  wsData.push([]);
+  wsData.push([]);
+  wsData.push(["Please see details as follows:"]);
+  wsData.push(["Equipment", "Amount"]);
+
+  // Breakdown
+  entry.breakdown.forEach(item => {
+    wsData.push([
+      item.code,
+      item.amount.toLocaleString(undefined, { style: "currency", currency: "PHP" })
+    ]);
+  });
+
+  // Grand total
+  wsData.push(["Grand Total", entry.currentBill.toLocaleString(undefined, { style: "currency", currency: "PHP" })]);
+  wsData.push([]);
+
+  // Totals
+  wsData.push([`Previous total billing – ₱${entry.previousBill.toLocaleString(undefined, { minimumFractionDigits: 2 })}`]);
+  wsData.push([`Current billing – ₱${entry.currentBill.toLocaleString(undefined, { minimumFractionDigits: 2 })}`]);
+  const formattedToDate = formatSingleDate(entry.toDate);
+wsData.push([`Total billing as of ${formattedToDate} – ₱${entry.totalBill.toLocaleString(undefined, { minimumFractionDigits: 2 })}`]);
+
+wsData.push([]);
+
+if (entry.segments && entry.segments.length > 0) {
+    const perSegmentTotal = entry.totalBill / entry.segments.length;
+
+    entry.segments
+      .map(Number)
+      .sort((a, b) => a - b)
+      .forEach(seg => {
+        wsData.push([
+          `Segment ${seg}`,
+          perSegmentTotal.toLocaleString(undefined, { style: "currency", currency: "PHP" })
+        ]);
+      });
+  }
+
+  wsData.push([]);
+
+  // Signatories
+  wsData.push(["Prepared by:"]);
+  wsData.push([]);
+  wsData.push(["ANGELIKA C. CASTILLO"]);
+  wsData.push(["Admin Staff"]);
+  wsData.push([]);
+  wsData.push(["Noted by:", "", "Noted by:"]);
+  wsData.push([]);
+  wsData.push(["ENGR. JUSTIN REI ESPINOSA", "", "ROAN MAICO DE GUZMAN"]);
+  wsData.push(["Project Site Engineer", "", "Logistics & Equipment Manager"]);
+  wsData.push([]);
+  wsData.push(["Approved by:", "", "Received by:"]);
+  wsData.push([]);
+  wsData.push(["RAMPEL LUIS P. DE GUZMAN", "", "FINANCE DEPARTMENT"]);
+  wsData.push(["President"]);
+
+  // Create worksheet
+  // Create worksheet
+const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+ws['!merges'] = ws['!merges'] || [];
+
+// Merge rows 8–9 across columns A–C (vertical merge)
+ws['!merges'].push({
+  s: { r: 7, c: 0 }, // start at row 8 (index 7), column A
+  e: { r: 8, c: 2 }  // end at row 9 (index 8), column C
+});
+
+// ✅ Set column widths (manually adjustable in Excel)
+ws['!cols'] = [
+  { wch: 28 }, // Column A: Equipment / Text (approx 25 characters width)
+  { wch: 20 }, // Column B: Amount (approx 15 characters width)
+  { wch: 28 }, // Column C (if any extra column)
+  // Add more objects if you have more columns in your sheet
+];
+
+// Workbook
+const wb = XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(wb, ws, "Billing Statement");
+
+// Download file
+XLSX.writeFile(wb, `Billing_Statement_${entry.projectCode}_${entry.toDate}.xlsx`);
+
+}
+
+// ✅ Simple number-to-words (PHP Peso format)
+function toWords(num) {
+  const a = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten",
+             "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen",
+             "Eighteen", "Nineteen"];
+  const b = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+
+  function inWords(n) {
+    if (n < 20) return a[n];
+    if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? " " + a[n % 10] : "");
+    if (n < 1000) return a[Math.floor(n / 100)] + " Hundred" + (n % 100 ? " " + inWords(n % 100) : "");
+    if (n < 1000000) return inWords(Math.floor(n / 1000)) + " Thousand" + (n % 1000 ? " " + inWords(n % 1000) : "");
+    if (n < 1000000000) return inWords(Math.floor(n / 1000000)) + " Million" + (n % 1000000 ? " " + inWords(n % 1000000) : "");
+    return "";
+  }
+
+  const pesos = Math.floor(num);
+  const cents = Math.round((num - pesos) * 100);
+
+  let words = inWords(pesos) + " PESOS";
+  if (cents > 0) {
+    words += " AND " + inWords(cents) + " CENTS";
+  }
+  return words.toUpperCase();
+}
+
+
+
+
+
+// Initial render
+renderTable();
+</script>
+
+</body>
+</html>

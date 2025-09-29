@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vehicle Renewal</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: 'Montserrat', sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
+  nav { background-color: #2c3e50; padding: 15px 25px; color: white; }
+  .nav-container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+  .logo { font-size: 20px; font-weight: 700; color: white; }
+  .nav-links { display: flex; gap: 15px; }
+  .nav-item { color: white; text-decoration: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; }
+  .nav-item:hover { background-color: white; color: #2c3e50; }
+  .back-button { display: block; margin: 10px 20px 0; background-color: #2c3e50; color: white; padding: 10px 25px; border: none; border-radius: 6px; cursor: pointer; text-decoration: none; width: fit-content; }
+  .back-button:hover { background-color: #34495e; }
+  h1 { text-align: center; color: #2c3e50; margin-top: 20px; }
+  .form-container { background: #2c3e50; color: white; max-width: 800px; margin: 20px auto; padding: 25px; border-radius: 10px; }
+  .form-group { margin-bottom: 15px; }
+  label { display: block; font-weight: bold; margin-bottom: 5px; }
+  input { width: 100%; padding: 10px; border: none; border-radius: 6px; font-size: 14px; }
+  .button-wrapper { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+  .button-wrapper button { background-color: #ffffff; color: #2c3e50; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; }
+  .button-wrapper button:hover { background-color: #ddd; }
+  .table-wrapper { max-width: 1000px; margin: 20px auto; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; background: white; }
+  th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+  th { background-color: #2c3e50; color: white; }
+  td button { background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+
+  /* ===== Calendar Styles ===== */
+.calendar-container {
+  max-width: 800px;
+  margin: 30px auto;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.calendar-header button {
+  background-color: #2c3e50;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.calendar-header button:hover {
+  background-color: #34495e;
+}
+
+#monthYear {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.calendar-grid div {
+  text-align: center;
+  padding: 12px 0;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.calendar-grid div:nth-child(-n+7) {
+  font-weight: bold;
+  color: #2c3e50;
+  background: #ecf0f1;
+}
+
+.calendar-grid .calendar-day {
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+.calendar-grid .calendar-day:hover {
+  background-color: #3498db;
+  color: white;
+}
+
+.calendar-grid .today {
+  background-color: #2ecc71;
+  color: white;
+  font-weight: bold;
+  border: none;
+}
+
+.calendar-grid .selected {
+  background-color: #e67e22 !important;
+  color: white !important;
+}
+
+/* Modal background */
+.modal {
+  display: none; 
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+}
+
+/* Modal box */
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  width: 300px;
+}
+
+/* Buttons inside modal */
+.modal-buttons {
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.modal-buttons button {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#saveDateBtn {
+  background: #27ae60;
+  color: white;
+}
+
+#cancelDateBtn {
+  background: #e74c3c;
+  color: white;
+}
+
+      .filter-container {
+  background: #ffffff;
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  align-items: center;
+}
+
+.filter-container label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  color: #2c3e50;
+  font-size: 14px;
+  
+}
+
+.filter-container input {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-top: 5px;
+  
+}.filter-container {
+  background: #ffffff;
+  max-width: 300px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  align-items: center;
+}
+
+.filter-container label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  color: #2c3e50;
+  font-size: 14px;
+  
+  
+}
+
+.filter-container input {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.warning-box strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.warning-month {
+  background: #f39c12; /* orange */
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.warning-urgent {
+  background: #e74c3c; /* red */
+  padding: 10px;
+  border-radius: 6px;
+}
+
+
+</style>
+
+<script>
+  // ---------------- LOGIN ENFORCEMENT ----------------
+  (function enforceLogin() {
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  const userRole = localStorage.getItem("userRole");
+
+  if (!isLoggedIn || (userRole !== "master" && userRole !== "logistics")) {
+    // Show white background instantly
+    document.documentElement.innerHTML = '<body style="background:#fff; margin:0"></body>';
+    
+    // Redirect to login
+    window.location.replace("../../login.html");
+  }
+})();
+</script>
+</head>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<main>
+<header>
+<nav>
+  <div class="nav-container">
+    <div class="logo">RD8 BUILDERS CORP</div>
+    <div class="menu-toggle" id="menu-toggle"><span></span><span></span><span></span></div>
+    <div class="nav-links" id="nav-links">
+      <a href="../../Index.html" class="nav-item">Home</a>
+      <a href="../../AboutUs.html" class="nav-item">About Us</a>
+      <a href="../../CompanyProfile.html" class="nav-item">Company Profile</a>
+      <a href="../../ContactUs.html" class="nav-item">Contact Us</a>
+      <a href="#" class="nav-item" id="authLink">Login</a>
+    </div>
+  </div>
+</nav>
+<a class="back-button" href="Logistics.html">← Back to Logistics</a>
+</header>
+
+<h1>VEHICLE RENEWAL</h1>
+<div id="monthlyWarning" class="warning-box"></div>
+
+<div class="button-wrapper" style="justify-content: center; margin: 20px;">
+  <button onclick="showForm()" style="background-color:#3498db; color:white;">Create Renewal</button>
+  <button onclick="showTable()" style="background-color:#e60e32; color:white;">View Database</button>
+  <button onclick="toggleVRRange()" style="background-color:#2ecc71; color:white;">Download VR</button>
+</div>
+
+<div id="vrRangeContainer" class="filter-container" style="max-width:600px; display:none; gap:15px; justify-content:center; margin:20px auto;">
+  <label>
+    Start Date
+    <input type="date" id="vrStartDate">
+  </label>
+  <label>
+    End Date
+    <input type="date" id="vrEndDate">
+  </label>
+  <button onclick="downloadVR()" style="background-color:#2ecc71; color:white;">Generate Excel</button>
+</div>
+
+
+<div class="form-container" id="renewalForm" style="display:none;">
+  <div class="form-group"><label>Equipment Name:</label><input type="text" id="equipmentName"></div>
+  <div class="form-group"><label>Equipment Code:</label><input type="text" id="equipmentCode"></div>
+  <div class="form-group"><label>Plate No.:</label><input type="text" id="plateNo"></div>
+  <div class="form-group"><label>Date of Registration:</label><input type="date" id="dateReg"></div>
+  <div class="form-group"><label>Date of Renewal:</label><input type="date" id="dateRen"></div>
+
+  <div class="button-wrapper">
+    <button onclick="postDetails()">Submit</button>
+    <button onclick="hideTable()" type="button" style="background-color:#3498db; color:white;">Hide Table</button>
+  </div>
+</div>
+
+<div class="filter-container" id="filterContainer" style="display:none;">
+  <label>Equipment Name
+    <input type="text" id="filterEquipment" oninput="applyFilters()" placeholder="Type Equipment">
+  </label>
+  <button onclick="clearFilters()" class="sort-button">Clear Filters</button>
+</div>
+
+
+<!-- Table wrapper (hidden by default) -->
+<div class="table-wrapper" id="databaseTable" style="display:none;">
+  <table>
+    <thead>
+      <tr>
+        <th>Equipment Name</th>
+        <th>Equipment Code</th>
+        <th>Plate No.</th>
+        <th>Date of Registration</th>
+        <th>Date of Renewal</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="dataBody"></tbody>
+  </table>
+</div>
+
+<div class="calendar-container" id="calendarContainer" style="max-width:800px;margin:20px auto;padding:20px;background:white;border-radius:10px;display:block;">
+  <div class="calendar-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+    <button onclick="prevMonth()">&#8592;</button>
+    <div id="monthYear" style="font-weight:bold;"></div>
+    <button onclick="nextMonth()">&#8594;</button>
+  </div>
+  <div class="calendar-grid" id="calendarGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;"></div>
+</div>
+
+<!-- Date Picker Modal -->
+<div id="datePickerModal" class="modal">
+  <div class="modal-content">
+    <h3 id="modalTitle">Update Vehicle Dates</h3>
+
+    <label for="newRegistrationDate" style="font-weight:bold; display:block; margin:8px 0 4px;">Date of Registration:</label>
+    <input type="date" id="newRegistrationDate">
+
+    <label for="newRenewalDate" style="font-weight:bold; display:block; margin:12px 0 4px;">Date of Renewal:</label>
+    <input type="date" id="newRenewalDate">
+
+    <div class="modal-buttons">
+      <button id="saveBothBtn">Submit</button>
+      <button id="cancelDateBtn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+let entries = JSON.parse(localStorage.getItem("vehicleRenewalEntries") || "[]");
+let editingIndex = null;
+
+function checkRenewalWarnings() {
+  const today = new Date();
+  const currentMonth = today.getMonth();
+  const currentYear = today.getFullYear();
+
+  const dueThisMonth = getLatestEntries().filter(e => {
+    if (!e.dateRen || e.dateRen === "TBD") return false;
+    const renDate = new Date(e.dateRen);
+    return renDate.getMonth() === currentMonth && renDate.getFullYear() === currentYear;
+  });
+
+  const dueSoon = getLatestEntries().filter(e => {
+    if (!e.dateRen || e.dateRen === "TBD") return false;
+    const renDate = new Date(e.dateRen);
+    const diffDays = Math.ceil((renDate - today) / (1000 * 60 * 60 * 24));
+    return diffDays > 0 && diffDays <= 7;
+  });
+
+  let messages = [];
+
+  // Show on the 1st day of the month
+  if (today.getDate() === 1 && dueThisMonth.length > 0) {
+    const list = dueThisMonth.map(e => `${e.equipmentName} (${formatDate(e.dateRen)})`).join("<br>");
+    messages.push(`<div class="warning-month"><strong>⚠️ Renewals Due This Month:</strong><br>${list}</div>`);
+  }
+
+  // Show if due within 7 days
+  if (dueSoon.length > 0) {
+    const list = dueSoon.map(e => `${e.equipmentName} (${formatDate(e.dateRen)})`).join("<br>");
+    messages.push(`<div class="warning-urgent"><strong>🚨 Renewals Due Within 7 Days:</strong><br>${list}</div>`);
+  }
+
+  const warningBox = document.getElementById("monthlyWarning");
+  warningBox.innerHTML = messages.join("<br>");
+  warningBox.style.display = messages.length > 0 ? "block" : "none";
+}
+
+
+
+
+
+// Run check when page loads
+window.onload = () => {
+  updateTable();
+  updateAuthUI();
+  checkRenewalWarnings();
+  renderCalendar();
+};
+
+
+
+
+function applyFilters() {
+  const equipmentFilter = document.getElementById("filterEquipment").value.toLowerCase();
+  const rows = document.querySelectorAll("#dataBody tr");
+
+  rows.forEach(row => {
+    const equipmentName = row.cells[0].textContent.toLowerCase(); // Equipment Name column
+    if (equipmentName.includes(equipmentFilter)) {
+      row.style.display = ""; // show row
+    } else {
+      row.style.display = "none"; // hide row
+    }
+  });
+}
+
+function clearFilters() {
+  document.getElementById("filterEquipment").value = "";
+  applyFilters(); // reset table view
+}
+
+// Format dates like "September 1, 2025"
+function formatDate(dateStr) {
+  if (!dateStr || dateStr === "TBD") return "TBD";
+  const date = new Date(dateStr);
+  return date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+}
+
+function save() { localStorage.setItem("vehicleRenewalEntries", JSON.stringify(entries)); }
+
+function updateTable() {
+  const body = document.getElementById("dataBody");
+  body.innerHTML = "";
+  entries.forEach((e, i) => {
+    const row = document.createElement("tr");
+    Object.keys(e).forEach(key => {
+      const td = document.createElement("td");
+      td.textContent = (key === "dateReg" || key === "dateRen") ? formatDate(e[key]) : e[key];
+      row.appendChild(td);
+    });
+
+    const tdAction = document.createElement("td");
+
+    // Edit button
+    const btnEdit = document.createElement("button");
+    btnEdit.textContent = "Edit";
+    btnEdit.style.backgroundColor = "#4CAF50"; // Blue
+    btnEdit.style.marginRight = "5px";
+    btnEdit.onclick = () => {
+  // Populate form with existing data
+  document.getElementById("equipmentName").value = e.equipmentName;
+  document.getElementById("equipmentCode").value = e.equipmentCode;
+  document.getElementById("plateNo").value = e.plateNo;
+  document.getElementById("dateReg").value = e.dateReg !== "TBD" ? e.dateReg : "";
+  document.getElementById("dateRen").value = e.dateRen !== "TBD" ? e.dateRen : "";
+
+  // Show the form and hide table
+  showForm();
+
+  // Set editing index (don't remove yet!)
+  editingIndex = i;
+};
+    tdAction.appendChild(btnEdit);
+
+    // Delete button
+    const btnDelete = document.createElement("button");
+    btnDelete.textContent = "Delete";
+    btnDelete.style.backgroundColor = "#e74c3c"; // Red
+    btnDelete.onclick = () => { entries.splice(i, 1); save(); updateTable(); };
+    tdAction.appendChild(btnDelete);
+
+    row.appendChild(tdAction);
+    body.appendChild(row);
+  });
+}
+
+function postDetails() {
+  const entry = {
+    equipmentName: document.getElementById("equipmentName").value || "N/A",
+    equipmentCode: document.getElementById("equipmentCode").value || "N/A",
+    plateNo: document.getElementById("plateNo").value || "N/A",
+    dateReg: document.getElementById("dateReg").value || "TBD",
+    dateRen: document.getElementById("dateRen").value || "TBD"
+  };
+
+  if (editingIndex !== null) {
+    // Replace the existing entry
+    entries[editingIndex] = entry;
+    editingIndex = null; // reset
+  } else {
+    entries.push(entry);
+  }
+
+  save();
+  updateTable();
+  checkRenewalWarnings(); // update warning box
+  document.querySelectorAll(".form-container input").forEach(el => el.value = "");
+}
+
+
+function updateAuthUI() {
+  const authLink = document.getElementById("authLink");
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  if (isLoggedIn) {
+    authLink.textContent = "Logout";
+    authLink.onclick = () => { localStorage.removeItem("isLoggedIn"); window.location.reload(); };
+  } else {
+    authLink.textContent = "Login";
+    authLink.onclick = () => { window.location.href = "../../login.html"; };
+  }
+}
+
+
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
+
+function toggleVRRange() {
+  const container = document.getElementById("vrRangeContainer");
+  container.style.display = container.style.display === "none" ? "flex" : "none";
+}
+
+function showForm() {
+  document.getElementById("renewalForm").style.display = "block";
+  document.getElementById("databaseTable").style.display = "none";
+}
+
+function showTable() {
+  document.getElementById("renewalForm").style.display = "none";
+  document.getElementById("databaseTable").style.display = "block";
+  document.getElementById("filterContainer").style.display = "flex"; // show filters
+}
+
+function hideTable() {
+  document.getElementById("databaseTable").style.display = "none";
+  document.getElementById("renewalForm").style.display = "none"; 
+  document.getElementById("filterContainer").style.display = "none"; // hide filters
+}
+
+function renderCalendar() {
+  const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const monthYear = document.getElementById("monthYear");
+  monthYear.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+  const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const grid = document.getElementById("calendarGrid");
+  grid.innerHTML = "";
+
+  // === Weekday Headers ===
+  const weekdays = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  weekdays.forEach(day => {
+    const headerCell = document.createElement("div");
+    headerCell.textContent = day;
+    headerCell.style.fontWeight = "bold";
+    headerCell.style.textAlign = "center";
+    grid.appendChild(headerCell);
+  });
+
+  // === Blank cells for alignment (before 1st day) ===
+  for (let i = 0; i < firstDay; i++) {
+    const blank = document.createElement("div");
+    grid.appendChild(blank);
+  }
+
+  // === Day Cells ===
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dayCell = document.createElement("div");
+    dayCell.classList.add("calendar-day");
+    Object.assign(dayCell.style, {
+      minHeight: "60px",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "flex-start",
+      fontSize: "12px"
+    });
+
+    // Day Number (top of cell)
+    const dayNum = document.createElement("div");
+    dayNum.textContent = d;
+    Object.assign(dayNum.style, {
+      fontWeight: "bold",
+      fontSize: "13px",
+      marginBottom: "2px",
+      background: "none",
+      borderRadius: "0"
+    });
+    dayCell.appendChild(dayNum);
+
+    // === Check if renewals fall on this date ===
+    getLatestEntries().forEach(entry => {
+      if (entry.dateRen && entry.dateRen !== "TBD") {
+        const renDate = new Date(entry.dateRen);
+        if (
+          renDate.getDate() === d &&
+          renDate.getMonth() === currentMonth &&
+          renDate.getFullYear() === currentYear
+        ) {
+          const equip = document.createElement("span");
+          equip.textContent = entry.equipmentName;
+          Object.assign(equip.style, {
+            fontSize: "10px",
+            background: "#2ecc71",
+            color: "white",
+            padding: "2px 4px",
+            borderRadius: "4px",
+            marginTop: "2px",
+            display: "inline-block",
+            cursor: "pointer"
+          });
+
+          // === Open Modal on Click ===
+          equip.onclick = () => {
+            const modal = document.getElementById("datePickerModal");
+            const modalTitle = document.getElementById("modalTitle");
+            const newRegistrationInput = document.getElementById("newRegistrationDate");
+            const newRenewalInput = document.getElementById("newRenewalDate");
+
+            modalTitle.textContent = `Update Dates for "${entry.equipmentName}"`;
+            newRegistrationInput.value = entry.dateReg !== "TBD" ? entry.dateReg : "";
+            newRenewalInput.value = entry.dateRen !== "TBD" ? entry.dateRen : "";
+
+            modal.style.display = "flex";
+
+            // Save button
+            document.getElementById("saveBothBtn").onclick = () => {
+              if (newRegistrationInput.value || newRenewalInput.value) {
+                const newEntry = {
+                  equipmentName: entry.equipmentName,
+                  equipmentCode: entry.equipmentCode,
+                  plateNo: entry.plateNo,
+                  dateReg: newRegistrationInput.value || entry.dateReg,
+                  dateRen: newRenewalInput.value || entry.dateRen
+                };
+                entries.push(newEntry); // keep old entry for history
+                save();
+                updateTable();
+                renderCalendar();
+              }
+              modal.style.display = "none";
+            };
+
+            // Cancel button
+            document.getElementById("cancelDateBtn").onclick = () => {
+              modal.style.display = "none";
+            };
+          };
+
+          dayCell.appendChild(equip);
+        }
+      }
+    });
+
+    // === Select Renewal Date on Calendar Click ===
+    dayCell.onclick = () => selectDate(d);
+
+    grid.appendChild(dayCell);
+  }
+}
+
+
+function getLatestEntries() {
+  const latestMap = new Map();
+
+  // Loop through all entries, overwrite with newest
+  entries.forEach(e => {
+    latestMap.set(e.equipmentCode, e); 
+  });
+
+  // Return only latest entries
+  return Array.from(latestMap.values());
+}
+
+
+function prevMonth() {
+  currentMonth--;
+  if(currentMonth < 0){
+    currentMonth = 11;
+    currentYear--;
+  }
+  renderCalendar();
+}
+
+function nextMonth() {
+  currentMonth++;
+  if(currentMonth > 11){
+    currentMonth = 0;
+    currentYear++;
+  }
+  renderCalendar();
+}
+
+function selectDate(day) {
+  const month = currentMonth + 1;
+  const formattedMonth = month < 10 ? "0" + month : month;
+  const formattedDay = day < 10 ? "0" + day : day;
+  const dateStr = `${currentYear}-${formattedMonth}-${formattedDay}`;
+
+  // By default, just set Date of Renewal field in form
+  document.getElementById("dateRen").value = dateStr;
+}
+
+
+renderCalendar();
+
+function downloadVR() {
+  const latest = getLatestEntries(); // get only latest entry per equipment
+  if (latest.length === 0) {
+    alert("No records available to export.");
+    return;
+  }
+
+  const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+  // Sort by renewal date
+  const sorted = latest.filter(e => e.dateRen && e.dateRen !== "TBD")
+    .sort((a, b) => new Date(a.dateRen) - new Date(b.dateRen));
+
+  let ws_data = [];
+  ws_data.push(["LTO O.R. RENEWAL CALENDAR", "", "", ""]); // Fill 4 cells
+  ws_data.push([]);
+
+  let currentMonth = "";
+  sorted.forEach(e => {
+    const date = new Date(e.dateRen);
+    const monthName = monthNames[date.getMonth()];
+    const formattedDate = `${monthName} ${date.getDate()}, ${date.getFullYear()}`;
+
+    if (monthName !== currentMonth) {
+      ws_data.push([monthName.toUpperCase()]);
+      ws_data.push(["EQUIPMENT NAME","EQUIPMENT CODE","PLATE NUMBER","DATE OF RENEWAL"]);
+      currentMonth = monthName;
+    }
+
+    ws_data.push([e.equipmentName, e.equipmentCode, e.plateNo, formattedDate]);
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(ws_data);
+
+  // Merge header across A1:D1
+  ws['!merges'] = [{ s: { r:0, c:0 }, e: { r:0, c:3 } }];
+
+  // === Auto-adjust column widths ===
+  let colWidths = ws_data[0].map(() => 10); // default min width 10
+  ws_data.forEach(row => {
+    row.forEach((val, i) => {
+      const strVal = val ? val.toString() : "";
+      if (strVal.length > colWidths[i]) {
+        colWidths[i] = strVal.length + 2; // add padding
+      }
+    });
+  });
+  ws['!cols'] = colWidths.map(w => ({ wch: w }));
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Renewals");
+
+  XLSX.writeFile(wb, "Vehicle_Renewals.xlsx");
+
+  // Optionally hide the date range box after export
+  document.getElementById("vrRangeContainer").style.display = "none";
+}
+
+
+
+
+
+
+
+</script>
+</main>
+
+
+</body>
+</html>

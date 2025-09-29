@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>INCOME AND EXPENSE SUMMARY</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+  height: 100%; /* allow body to fill the viewport */
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Montserrat', sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* full viewport height */
+}
+
+main, .upload-container, .table-wrapper {
+  flex: 1; /* take up remaining space */
+}
+
+.footer {
+  width: 100%;           /* full width */
+  background-color: #2c3e50;
+  color: white;
+  text-align: center;
+  padding: 15px 20px;
+  margin-top: auto;      /* push footer to bottom */
+  box-sizing: border-box;
+}
+
+
+
+
+ nav {
+  width: 100%;           /* full width */
+  padding: 15px 25px;    /* internal padding */
+  background-color: #2c3e50;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  box-sizing: border-box; /* include padding in width */
+}
+  .logo { font-size:20px; font-weight:700; }
+  .nav-links a { color:white; text-decoration:none; margin-left:15px; }
+  .back-button { margin:10px 20px; display:inline-block; background:#2c3e50; color:white; padding:10px 25px; border-radius:6px; text-decoration:none; }
+  h1 { text-align:center; color:#2c3e50; margin-top:20px; }
+  .upload-container { background:#2c3e50; color:white; max-width:900px; margin:20px auto; padding:25px; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.1); }
+  .upload-container input[type=file] { display:block; margin:10px 0; padding:8px; border-radius:6px; border:none; width:100%; }
+  .button-wrapper { text-align:center; margin-top:20px; }
+  .button-wrapper button { background-color:#ffffff; color:#2c3e50; padding:10px 20px; border:none; border-radius:6px; cursor:pointer; font-size:16px; margin:5px; }
+  .button-wrapper button:hover { background-color:#ddd; }
+  table { width:100%; border-collapse:collapse; min-width:800px; background-color:white; }
+  th, td { border:1px solid #ccc; padding:10px; text-align:center; font-size:14px; }
+  th { background-color:#2c3e50; color:white; }
+  td[contenteditable="true"] { background-color:white; }
+  td.editing { outline:2px solid #3498db; }
+
+.excel-container {
+  display: flex;
+  flex-wrap: wrap;        /* allow wrapping to next row */
+  justify-content: center; /* center horizontally */
+  gap: 20px;              /* spacing between boxes */
+}
+
+.excel-upload {
+  background: #34495e;
+  padding: 15px;
+  border-radius: 8px;
+  width: 42%;             /* 2 per row (roughly 50% minus gap) */
+  min-width: 250px;       /* ensures it doesn’t get too small on mobile */
+  box-sizing: border-box;
+  text-align: center;     /* center label and input */
+}
+.excel-upload label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #fff;
+  
+}
+.excel-upload input[type=file] {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+}
+
+.upload-container h3 {
+  text-align: center; /* ✅ centers the text */
+  margin-bottom: 20px; /* optional spacing below the heading */
+}
+.table-wrapper {
+  overflow-x: auto;
+  overflow-y: auto;
+  margin: 30px auto;
+  max-width: 1300px;
+  max-height: 500px;
+  border: 1px solid #ccc;
+  display: none; /* hide all tables by default */
+}
+.table-wrapper.active {
+  display: block;
+}
+h3 {
+  text-align: center;
+}
+
+
+</style>
+    <script>
+  // ---------------- LOGIN ENFORCEMENT ----------------
+  (function enforceLogin() {
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  const userRole = localStorage.getItem("userRole");
+
+  if (!isLoggedIn || (userRole !== "master" && userRole !== "logistics")) {
+    // Show white background instantly
+    document.documentElement.innerHTML = '<body style="background:#fff; margin:0"></body>';
+    
+    // Redirect to login
+    window.location.replace("../../login.html");
+  }
+})();
+</script>
+
+</head>
+<body>
+
+<nav>
+  <div class="logo">RD8 BUILDERS CORP</div>
+  <div class="nav-links">
+    <a href="../../Index.html">Home</a>
+    <a href="../../AboutUs.html">About Us</a>
+    <a href="../../CompanyProfile.html">Company Profile</a>
+    <a href="../../ContactUs.html">Contact Us</a>
+    <a href="#" id="authLink">Login</a>
+  </div>
+</nav>
+
+<main>
+<a class="back-button" href="Logistics.html">← Back to Logistics</a>
+<h1>INCOME AND EXPENSE SUMMARY</h1>
+
+<div class="upload-container">
+  <h3>UPLOAD EXCEL FILES</h3>
+  <div class="excel-container">
+    <div class="excel-upload">
+      <label>Upload Equipment Rental Summary</label>
+      <input type="file" id="equipmentRental" accept=".xlsx,.xls">
+    </div>
+    <div class="excel-upload">
+      <label>Upload Fuel Expense Summary</label>
+      <input type="file" id="fuelExpense" accept=".xlsx,.xls">
+    </div>
+    <div class="excel-upload">
+      <label>Upload RMES</label>
+      <input type="file" id="rmes" accept=".xlsx,.xls">
+    </div>
+    <div class="excel-upload">
+      <label>Upload Operator Salary Summary</label>
+      <input type="file" id="operatorSalary" accept=".xlsx,.xls">
+    </div>
+  </div>
+<!-- Generate button stays inside upload container -->
+<div class="button-wrapper">
+  <button onclick="loadExcelFiles()">Generate Summary</button>
+</div>
+
+<!-- Download button goes above first table, hidden initially -->
+<div class="button-wrapper" id="downloadWrapper" style="text-align:center; margin:20px auto; display:none;">
+  <button 
+    onclick="downloadSummary()" 
+    style="background-color:#27ae60; color:white; padding:10px 20px; border:none; border-radius:6px; cursor:pointer; font-size:16px;">
+    Download Summary
+  </button>
+</div>
+
+</div>
+
+<div id="equipmentWrapper" class="table-wrapper" style="max-width:800px; margin:20px auto;">
+  <h3>Equipment Rental Summary</h3>
+  <table id="equipmentTable">
+    <thead>
+      <tr>
+        <th>Equipment Code</th>
+        <th>Total Gross Rental</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<div id="fuelWrapper" class="table-wrapper" style="max-width:800px; margin:20px auto;">
+  <h3>Fuel Expense Summary</h3>
+  <table id="fuelTable">
+    <thead>
+      <tr>
+        <th>Equipment Code</th>
+        <th>Total Cost</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<div id="rmesWrapper" class="table-wrapper" style="max-width:800px; margin:20px auto;">
+  <h3>Repair & Maintenance Expense Summary</h3>
+  <table id="rmesTable">
+    <thead>
+      <tr>
+        <th>Equipment Code</th>
+        <th>Total Amount</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<div id="salaryWrapper" class="table-wrapper" style="max-width:800px; margin:20px auto;">
+  <h3>Operator Salary Summary</h3>
+  <table id="salaryTable">
+    <thead>
+      <tr>
+        <th>Equipment Code</th>
+        <th>Total Net Pay</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+</main>
+
+
+
+<footer class="footer">
+  <p>&copy; Kurth Clarenze Lacsinto Novesteras. All rights reserved.</p>
+</footer>
+
+<script>
+
+function readExcel(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+
+      // Get raw sheet as 2D array
+      const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+      // Find the header row (where "Equipment Code" appears)
+      const headerRowIndex = rows.findIndex(r => r.some(cell => /Equipment Code/i.test(cell)));
+      if (headerRowIndex === -1) {
+        resolve([]);
+        return;
+      }
+
+      // Parse again starting from headerRowIndex
+      let dataJson = XLSX.utils.sheet_to_json(worksheet, { range: headerRowIndex, defval: "" });
+
+      // ✅ Header normalization map
+      const headerMap = {
+        equipmentcode: "equipmentcode",
+        equipment: "equipmentcode",   // fallback
+        totalgrossrental: "totalgrossrental",
+        grossrental: "totalgrossrental", // fallback
+        totalcost: "totalcost",
+        cost: "totalcost",
+        totalamount: "totalamount",
+        amount: "totalamount",
+        totalnetpay: "totalnetpay",
+        netpay: "totalnetpay"
+      };
+
+      // ✅ Normalize keys for all rows
+      dataJson = dataJson.map(row => {
+        const normalized = {};
+        Object.keys(row).forEach(k => {
+          const newKey = k.toLowerCase().replace(/\s+/g, "");
+          if (headerMap[newKey]) {
+            normalized[headerMap[newKey]] = row[k];
+          }
+        });
+        return normalized;
+      });
+
+      resolve(dataJson);
+    };
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+
+
+
+async function loadExcelFiles() {
+  const files = [
+  { input: "equipmentRental", table: "equipmentTable", wrapper: "equipmentWrapper", costKey: "totalgrossrental" },
+  { input: "fuelExpense", table: "fuelTable", wrapper: "fuelWrapper", costKey: "totalcost" },
+  { input: "rmes", table: "rmesTable", wrapper: "rmesWrapper", costKey: "totalamount" },
+  { input: "operatorSalary", table: "salaryTable", wrapper: "salaryWrapper", costKey: "totalnetpay" },
+];
+
+
+  for (const f of files) {
+    const file = document.getElementById(f.input).files[0];
+    const wrapper = document.getElementById(f.wrapper);
+    const tbody = document.querySelector(`#${f.table} tbody`);
+
+    // clear table + hide wrapper before showing
+    tbody.innerHTML = "";
+    wrapper.classList.remove("active");
+
+    if (!file) continue;
+
+    const data = await readExcel(file);
+
+// Group costs by equipment code
+const grouped = {};
+data.forEach(row => {
+  const equipment = row["equipmentcode"]?.toString().trim();
+  if (!equipment) return;
+
+  // 🚫 Skip if this is a Grand Total row from the file itself
+  if (/grand\s*total/i.test(equipment)) return;
+
+  let rawCost = row[f.costKey];
+  if (typeof rawCost === "string") {
+    rawCost = rawCost.replace(/[^0-9.-]+/g, "");
+  }
+  const cost = parseFloat(rawCost) || 0;
+
+  if (!grouped[equipment]) grouped[equipment] = 0;
+  grouped[equipment] += cost;
+});
+
+
+// Render rows
+let total = 0;
+Object.entries(grouped).forEach(([equipment, cost]) => {
+  total += cost;
+  const tr = `<tr>
+    <td>${equipment}</td>
+    <td>${cost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+  </tr>`;
+  tbody.insertAdjacentHTML("beforeend", tr);
+});
+
+
+// ✅ Add grand total row at the end
+if (total > 0) {
+  const totalRow = `<tr style="font-weight:bold; background:#f0f0f0;">
+    <td>Grand Total</td>
+    <td>${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+  </tr>`;
+  tbody.insertAdjacentHTML("beforeend", totalRow);
+}
+
+
+
+    // ✅ show wrapper only when data was loaded
+    if (tbody.children.length > 0) {
+      wrapper.classList.add("active");
+    }
+  }
+const downloadWrapper = document.getElementById("downloadWrapper");
+const anyTableActive = document.querySelectorAll(".table-wrapper.active").length > 0;
+downloadWrapper.style.display = anyTableActive ? "block" : "none";
+
+  
+}
+
+function downloadSummary() {
+  const wb = XLSX.utils.book_new();
+  let allData = [];
+
+  // track row indices for styling/merging
+  const mergeRows = [];      // rows to merge A:B (title/date/LESS EXPENSE)
+  const sectionRows = [];    // GROSS RENTAL, DIESEL EXPENSE, ...
+  const headerRows = [];     // table header rows (Equipment Code / Total ...)
+  const grandTotalRows = []; // rows where first column contains "GRAND TOTAL"
+
+  // --- Master header (A1:B1) and date (A2:B2) ---
+  allData.push(["LOGISTICS INCOME AND EXPENSE"]);
+  mergeRows.push(allData.length - 1);
+
+  allData.push([new Date().toLocaleDateString()]);
+  mergeRows.push(allData.length - 1);
+
+  allData.push([]); // blank
+  allData.push([]); // blank (two blank rows before gross rental)
+
+  // Tables definition (IDs match your HTML)
+  const tables = [
+    { id: "equipmentTable", name: "GROSS RENTAL" },
+    { id: "fuelTable",      name: "DIESEL EXPENSE", prepend: "LESS EXPENSE FOR RD8" },
+    { id: "rmesTable",      name: "MAINTENANCE & OTHERS" },
+    { id: "salaryTable",    name: "SALARY EXPENSE" }
+  ];
+
+  // Helper: parse numeric-like strings into numbers (remove commas, peso sign, spaces)
+  const parseNumber = txt => {
+    if (txt === null || txt === undefined) return null;
+    const s = String(txt).trim();
+    // If it doesn't contain any digit, return original text (keeps equipment codes)
+    if (!/[0-9]/.test(s)) return null;
+    const cleaned = s.replace(/[^0-9.-]+/g, "");
+    if (cleaned === "" || cleaned === "." || cleaned === "-" ) return null;
+    const n = parseFloat(cleaned);
+    return isFinite(n) ? n : null;
+  };
+
+  tables.forEach((t, tableIndex) => {
+    const el = document.getElementById(t.id);
+    if (!el) return;
+    const tbody = el.querySelector("tbody");
+    if (!tbody || tbody.children.length === 0) return;
+
+    // Optional prepend (LESS EXPENSE FOR RD8)
+    if (t.prepend) {
+      allData.push([t.prepend.toUpperCase()]);
+      mergeRows.push(allData.length - 1);
+    }
+
+    // Section title (GROSS RENTAL, DIESEL EXPENSE, ...)
+    allData.push([t.name.toUpperCase()]);
+    sectionRows.push(allData.length - 1);
+
+    // Table header row (uppercase)
+    const headers = Array.from(el.querySelectorAll("thead tr th"))
+      .map(th => th.innerText.trim().toUpperCase());
+    allData.push(headers);
+    headerRows.push(allData.length - 1);
+
+    // Table body rows: convert amounts (all columns except first) to numbers where possible
+    const bodyRows = Array.from(tbody.querySelectorAll("tr")).map(tr => {
+      const cells = Array.from(tr.querySelectorAll("td")).map((td, idx) => {
+        const txt = td.innerText.trim();
+        if (idx === 0) {
+          // Keep label / equipment code as string (preserve text)
+          return txt;
+        } else {
+          // try parse number
+          const num = parseNumber(txt);
+          return (num === null) ? (txt === "" ? "" : txt) : num;
+        }
+      });
+      return cells;
+    });
+
+    // detect grand total rows (based on first column)
+    bodyRows.forEach((r, i) => {
+      const label = String(r[0] ?? "").toLowerCase();
+      if (label.includes("grand total")) {
+        // absolute row index in allData after adding previous rows
+        grandTotalRows.push(allData.length + i);
+      }
+    });
+
+    // append body rows to allData
+    allData = allData.concat(bodyRows);
+
+    // blank separator except after last table
+    if (tableIndex < tables.length - 1) allData.push([]);
+  });
+
+      // ---------------- COMPUTE EXTRA TOTALS ----------------
+  function getGrandTotalFrom(tableId) {
+    const tbody = document.querySelector(`#${tableId} tbody`);
+    if (!tbody) return 0;
+    const lastRow = tbody.querySelector("tr:last-child td:last-child");
+    if (!lastRow) return 0;
+    const txt = lastRow.innerText.trim();
+    const num = parseNumber(txt);
+    return num || 0;
+  }
+
+  const grossTotal   = getGrandTotalFrom("equipmentTable");
+  const dieselTotal  = getGrandTotalFrom("fuelTable");
+  const maintTotal   = getGrandTotalFrom("rmesTable");
+  const salaryTotal  = getGrandTotalFrom("salaryTable");
+
+  const lessExpense = dieselTotal + maintTotal + salaryTotal;
+  const variance    = grossTotal - lessExpense;
+
+  allData.push([]);
+  allData.push(["LESS EXPENSE FROM RD8 GRAND TOTAL", lessExpense]);
+  grandTotalRows.push(allData.length - 1);
+  allData.push([]); // blank
+  allData.push(["VARIANCE", variance]);
+  grandTotalRows.push(allData.length - 1);
+  allData.push([]); // blank
+  allData.push([]); // blank
+
+  allData.push(["Prepared By:", "Noted By:"]);
+  allData.push([]); // blank
+  allData.push(["Angelika C. Castillo", "Roan Maico P. De Guzman"]);
+  allData.push(["Admin Staff", "Logistics & Equipment Manager"]);
+
+  // Build worksheet from the combined array
+  const ws = XLSX.utils.aoa_to_sheet(allData);
+
+  // Set two-column width (A & B)
+  ws['!cols'] = [{ wch: 30 }, { wch: 30 }];
+
+  // Set two-column width (A & B)
+  ws['!cols'] = [{ wch: 40 }, { wch: 22 }];
+
+  // Only merge the requested rows across A:B
+  ws['!merges'] = mergeRows.map(r => ({ s: { r, c: 0 }, e: { r, c: 1 } }));
+
+  sectionRows.forEach(r => {
+  ws['!merges'].push({ s: { r, c: 0 }, e: { r, c: 1 } });
+});
+
+  // ---------- Styling helpers ----------
+  function setCellStyle(r, c, style) {
+    const addr = XLSX.utils.encode_cell({ r, c });
+    if (!ws[addr]) return;
+    ws[addr].s = Object.assign({}, ws[addr].s || {}, style);
+  }
+  function styleTwoCols(r, style) {
+    setCellStyle(r, 0, style);
+    setCellStyle(r, 1, style);
+  }
+
+  // Center + bold for merged rows (title & date & LESS EXPENSE)
+  mergeRows.forEach(r => {
+    styleTwoCols(r, { font: { bold: true, sz: 12 }, alignment: { horizontal: "center", vertical: "center" } });
+  });
+
+  // Section titles: bold + center (GROSS RENTAL, DIESEL EXPENSE...)
+  sectionRows.forEach(r => {
+    styleTwoCols(r, { font: { bold: true, sz: 14 }, alignment: { horizontal: "center", vertical: "center" } });
+  });
+
+  // Table headers: bold + center
+  headerRows.forEach(r => {
+    styleTwoCols(r, { font: { bold: true }, alignment: { horizontal: "center", vertical: "center" } });
+  });
+
+  // Grand total rows: label bold+center, amount bold+right
+  grandTotalRows.forEach(r => {
+    setCellStyle(r, 0, { font: { bold: true }, alignment: { horizontal: "center", vertical: "center" } });
+    setCellStyle(r, 1, { font: { bold: true }, alignment: { horizontal: "right", vertical: "center" } });
+  });
+
+  // ---------- Apply Peso formatting to numeric cells in column B ----------
+  // Safe-guard: ensure ws['!ref'] exists
+  if (!ws['!ref']) ws['!ref'] = XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: allData.length - 1, c: 1 }});
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for (let r = range.s.r; r <= range.e.r; r++) {
+    const addrB = XLSX.utils.encode_cell({ r, c: 1 });
+    const cellB = ws[addrB];
+    if (!cellB) continue;
+    // If the cell already has a numeric value (type 'n' or number), apply peso format.
+    // If it is a string that contains digits, attempt to parse it just in case.
+    if (typeof cellB.v === "number") {
+      cellB.t = "n";
+      cellB.s = Object.assign({}, cellB.s || {}, { numFmt: '"₱"#,##0.00', alignment: { horizontal: "right" } });
+    } else {
+      // try parse strings like "1,234.00" or "₱1,234.00"
+      const maybeNum = parseNumber(cellB.v);
+      if (maybeNum !== null) {
+        cellB.v = maybeNum;
+        cellB.t = "n";
+        cellB.s = Object.assign({}, cellB.s || {}, { numFmt: '"₱"#,##0.00', alignment: { horizontal: "right" } });
+      }
+    }
+  }
+
+  // For header rows and section rows, ensure text is uppercase and bold if not already
+  // (Also convert header text to uppercase in-sheet so display matches.)
+  for (let r = range.s.r; r <= range.e.r; r++) {
+    for (let c = 0; c <= 1; c++) {
+      const addr = XLSX.utils.encode_cell({ r, c });
+      const cell = ws[addr];
+      if (!cell || typeof cell.v !== "string") continue;
+      // Keep content, but uppercase text for headers/section rows that we marked
+      const isHeaderRow = headerRows.includes(r);
+      const isSectionRow = sectionRows.includes(r);
+      const isMergeRow = mergeRows.includes(r);
+      if (isHeaderRow || isSectionRow || isMergeRow) {
+        cell.v = String(cell.v).toUpperCase();
+      }
+    }
+  }
+
+  // Append sheet and write file
+  XLSX.utils.book_append_sheet(wb, ws, "Operators Summary");
+  XLSX.writeFile(wb, "IncomeAndExpense.xlsx");
+}
+
+const authLink=document.getElementById("authLink");
+  function updateAuthUI(){
+    const isLoggedIn=localStorage.getItem("isLoggedIn")==="true";
+    if(isLoggedIn){ authLink.textContent="Logout"; authLink.onclick=()=>{ if(confirm("Logout?")){localStorage.removeItem("isLoggedIn");window.location.href="../../login.html";} }; }
+    else { authLink.textContent="Login"; authLink.onclick=()=>{window.location.href="../../login.html";}; }
+  }
+ window.onload = () => {
+  updateTable();
+  updateAuthUI();
+};
+
+</script>
+
+</body>
+</html>

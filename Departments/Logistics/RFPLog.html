@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RFP-Logistics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="arial-normal.js"></script>
+  <script src="arial-bold.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Montserrat', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    main {
+      flex: 1;
+    }
+
+    nav {
+      background-color: #2c3e50;
+      padding: 15px 25px;
+      color: white;
+    }
+
+    .nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      font-size: 24px;
+      margin-top: 20px;
+    }
+
+    .form-container {
+      background: #2c3e50;
+      color: white;
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    textarea { resize: vertical; }
+
+    .button-wrapper {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .button-wrapper button {
+      background-color: #ffffff;
+      color: #2c3e50;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      max-width: 150px;
+      width: 100%;
+    }
+
+    .button-wrapper button:hover {
+      background-color: #ddd;
+    }
+
+.table-wrapper {
+  overflow-x: auto;
+  margin: 30px auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  background-color: #fff;
+  padding: 10px;
+  max-width: 95%;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  background-color: white;
+  table-layout: fixed; /* 🔹 force equal column widths */
+}
+
+/* Make table scrollable on small screens */
+.table-container {
+  width: 100%;
+  overflow-x: auto;   /* 🔹 enables horizontal scroll */
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+  font-size: 14px;
+  word-wrap: break-word; /* 🔹 allow wrapping */
+  overflow-wrap: break-word; /* 🔹 modern browsers */
+  white-space: normal; /* 🔹 allow multiple lines */
+}
+
+
+    th {
+  background-color: #2c3e50;
+  color: white;
+  font-weight: 600;
+  text-align: center;
+  padding: 12px 15px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+/* Cells */
+td {
+  border-bottom: 1px solid #ddd;
+  padding: 12px 15px;
+  text-align: center;
+  vertical-align: middle;
+  white-space: normal; /* allow wrapping */
+}
+
+/* Alternate row colors */
+tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Hover effect */
+tbody tr:hover {
+  background-color: #e8f0fe;
+}
+
+/* Editable cells highlight */
+td[contenteditable="true"] {
+  background-color: #fff8dc;
+}
+
+td.editing {
+  outline: 2px solid #3498db;
+}
+
+    td[contenteditable="true"] { background-color: white; }
+    td.editing { outline: 2px solid #3498db; }
+
+    td:last-child {
+  text-align: center;
+  display: flex;
+  flex-direction: column;  /* stack vertically */
+  gap: 8px;                /* space between buttons */
+  align-items: center;
+}
+
+td:last-child button {
+  width: 120px;            /* 🔹 fixed width */
+  height: 36px;            /* 🔹 fixed height */
+  font-size: 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+    @media (max-width: 600px) {
+      nav {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      h1 { font-size: 20px; }
+
+      .form-container {
+        padding: 20px 15px;
+        margin: 15px;
+      }
+
+      input, textarea {
+        font-size: 13px;
+        padding: 8px;
+      }
+
+      .button-wrapper button { font-size: 15px; }
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .nav-item, .nav-item-button {
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      padding: 10px 15px;
+      background: none;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .nav-item:hover, .nav-item-button:hover {
+      background-color: white;
+      color: #2c3e50;
+    }
+
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      margin-left: auto;
+      gap: 4px;
+    }
+
+    .menu-toggle span {
+      height: 3px;
+      width: 25px;
+      background: white;
+      border-radius: 3px;
+    }
+
+    .nav-links.show {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: flex;
+      }
+
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        margin-top: 10px;
+      }
+
+      .nav-item {
+        width: 100%;
+        padding: 10px 0;
+      }
+    }
+
+    .back-button {
+      display: block;
+      margin: 10px 20px 0;
+      text-align: left;
+      background-color: #2c3e50;
+      color: white;
+      padding: 10px 25px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      text-decoration: none;
+      width: fit-content;
+    }
+
+    .back-button:hover {
+      background-color: #34495e;
+    }
+
+    .footer {
+      background-color: #2c3e50;
+      color: white;
+      text-align: center;
+      padding: 15px 20px;
+      position: relative;
+      bottom: 0;
+      width: 100%;
+      margin-top: 40px;
+    }
+
+    input:disabled,
+    textarea:disabled,
+    button:disabled {
+      background-color: #ccc;
+      color: #555;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+input[type="date"] {
+  width: 150px; /* adjust as needed */
+}
+
+    .filter-container {
+  background: #ffffff;
+  max-width: 1100px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  align-items: center;
+}
+
+.filter-container label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  color: #2c3e50;
+  font-size: 14px;
+  
+}
+
+.filter-container input {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* Consistent Add/Delete button styles */
+.btn-add, .btn-remove {
+  border: none;
+  border-radius: 6px;
+  padding: 8px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  color: white;
+}
+
+.btn-add {
+  background-color: #27ae60; /* green */
+}
+
+.btn-add:hover {
+  background-color: #2ecc71;
+}
+
+.btn-remove {
+  background-color: #e74c3c; /* red */
+}
+
+.btn-remove:hover {
+  background-color: #c0392b;
+}
+
+
+  </style>
+
+  <script>
+  // ---------------- LOGIN ENFORCEMENT ----------------
+  (function enforceLogin() {
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  const userRole = localStorage.getItem("userRole");
+
+  if (!isLoggedIn || (userRole !== "master" && userRole !== "logistics")) {
+    // Show white background instantly
+    document.documentElement.innerHTML = '<body style="background:#fff; margin:0"></body>';
+    
+    // Redirect to login
+    window.location.replace("../../login.html");
+  }
+})();
+</script>
+</head>
+<body>
+<main>
+<header>
+<nav>
+  <div class="nav-container">
+    <div class="logo">RD8 BUILDERS CORP</div>
+
+    <div class="menu-toggle" id="menu-toggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+
+    <div class="nav-links" id="nav-links">
+        <a href="../../Index.html" class="nav-item">Home</a>
+        <a href="../../AboutUs.html" class="nav-item">About Us</a>
+        <a href="../../CompanyProfile.html" class="nav-item">Company Profile</a> <!-- Always accessible -->
+        <a href="../../ContactUs.html" class="nav-item">Contact Us</a>
+      <a href="#" class="nav-item" id="authLink">Login</a>
+    </div>
+  </div>
+</nav>
+
+<a class="back-button" href="Logistics.html">← Back to Logistics</a>
+</header>
+
+<h1>REQUEST FOR PAYMENT</h1>
+
+<div class="form-container">
+  <div class="form-group"><label for="date">Date:</label><input type="date" id="date" /></div>
+  <div class="form-group"><label for="requestor">Requestor:</label><input type="text" id="requestor" /></div>
+  <div class="form-group"><label for="series">Series:</label><input type="text" id="series" /></div>
+  <div class="form-group"><label for="rfNumber">RF No.:</label><input type="text" id="rfNumber" /></div>
+  <div class="form-group"><label for="equipment">Equipment:</label><input type="text" id="equipment" /></div>
+  <div class="form-group"><label for="supplier">Supplier:</label><input type="text" id="supplier" /></div>
+
+  <!-- Parts Section -->
+<div class="form-group">
+  <label>Parts:</label>
+  <div id="partsContainer"></div>
+</div>
+
+<div class="form-group">
+  <label for="signatory">Signatory:</label>
+  <select id="signatory" style="
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: white;
+    color: black;
+  ">
+    <option value="">Select Signatory</option>
+    <option value="ANGELIKA C. CASTILLO">ANGELIKA C. CASTILLO</option>
+    <option value="JAREN NICO TALAMPAS">JAREN NICO TALAMPAS</option>
+  </select>
+</div>
+
+  <div class="button-wrapper">
+    <button onclick="postDetails()">Submit</button>
+    <button onclick="toggleEditMode()">Edit Mode</button>
+  </div>
+</div>
+
+<div class="filter-container">
+
+  <label>  Date Start
+  <input type="date" id="filterStartDate" onchange="applyFilters()">
+  </label>
+<label>  Date End
+<input type="date" id="filterEndDate" onchange="applyFilters()">
+</label>
+  <label>  Series
+  <input type="text" id="filterSeries" oninput="applyFilters()" placeholder="Type Series">
+  </label>
+  <label>Equipment
+  <input type="text" id="filterEquipment" oninput="applyFilters()" placeholder="Type Equipment">
+</label>
+<label>  Supplier
+  <input type="text" id="filterSupplier" oninput="applyFilters()" placeholder="Type Supplier">
+  </label>  
+  <button onclick="clearFilters()" class="sort-button">Clear Filters</button>
+</div>
+
+<div class="table-wrapper">
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Requestor</th>
+        <th>Series</th>
+        <th>RF No.</th>
+        <th>Equipment</th>
+        <th>Supplier</th>
+        <th>Parts</th>
+        <th>Cost</th>
+        <th>Subtotal</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="dataBody"></tbody>
+  </table>
+</div>
+
+<script>
+  const entries = JSON.parse(localStorage.getItem("rfpLogisticsEntries") || "[]");
+  let editingEnabled = false;
+
+  function applyFilters() {
+  const startDate = document.getElementById("filterStartDate").value;
+  const endDate = document.getElementById("filterEndDate").value;
+  const seriesFilter = document.getElementById("filterSeries").value.toLowerCase();
+  const equipmentFilter = document.getElementById("filterEquipment").value.toLowerCase();
+  const supplierFilter = document.getElementById("filterSupplier").value.toLowerCase();
+
+  const tableBody = document.getElementById("dataBody");
+  tableBody.innerHTML = "";
+
+  let grandTotal = 0;
+
+  // Filter entries
+  const filteredEntries = entries.filter(entry => {
+  const entryDate = entry.date;
+  const entrySeries = entry.series.toLowerCase();
+  const entrySupplier = entry.supplier.toLowerCase();
+  const entryEquipment = (entry.equipment || "").toLowerCase();
+
+  const dateMatch =
+    (!startDate || entryDate >= startDate) &&
+    (!endDate || entryDate <= endDate);
+
+  const seriesMatch = !seriesFilter || entrySeries.includes(seriesFilter);
+  const supplierMatch = !supplierFilter || entrySupplier.includes(supplierFilter);
+  const equipmentMatch = !equipmentFilter || entryEquipment.includes(equipmentFilter);
+
+  return dateMatch && seriesMatch && supplierMatch && equipmentMatch;
+});
+
+  filteredEntries.forEach((entry, rowIndex) => {
+    const row = document.createElement("tr");
+
+    const partsText = entry.parts.map(p => p.part).join("\n");
+    const costsText = entry.parts.map(p => p.cost).join("\n");
+    const subtotal = entry.parts.reduce((sum, p) => sum + (Number(p.cost) || 0), 0);
+    grandTotal += subtotal;
+
+    row.innerHTML = `
+      <td>${entry.date}</td>
+      <td>${entry.requestor}</td>
+      <td>${entry.series}</td>
+      <td>${entry.rfNumber}</td>
+      <td>${entry.equipment}</td>
+      <td>${entry.supplier}</td>
+      <td style="white-space: pre-line;">${partsText}</td>
+      <td style="white-space: pre-line;">${entry.parts.map(p => "\u20B1 " + Number(p.cost).toLocaleString()).join("\n")}
+</td>
+<td>\u20B1 ${subtotal.toLocaleString()}</td>
+
+      <td>
+  <button style="background-color:#3498db; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; margin-bottom:5px;" onclick="editEntry(${rowIndex})">Edit</button>
+  <button style="background-color:#e74c3c; color:white; border:none; padding:10px 10px; border-radius:5px; cursor:pointer; margin-bottom:5px;" onclick="deleteEntry(${rowIndex})">Delete</button>
+  <button style="background-color:#27ae60; color:white; border:none; padding:10px 15px; border-radius:5px; cursor:pointer;" onclick="downloadPDF(${rowIndex})">Download</button>
+</td>
+
+    `;
+    tableBody.appendChild(row);
+  });
+
+// Add Grand Total row
+if (entries.length > 0) {
+  const totalRow = document.createElement("tr");
+  totalRow.innerHTML = `
+    <td colspan="8" style="font-weight:bold; text-align:center;">GRAND TOTAL</td> <!-- Text on left -->
+    <td style="font-weight:bold; text-align:center;">\u20B1 ${grandTotal.toLocaleString()}</td>
+    <td></td> <!-- Empty Action column -->
+  `;
+  tableBody.appendChild(totalRow);
+}
+}
+
+function clearFilters() {
+  document.getElementById("filterStartDate").value = "";
+  document.getElementById("filterEndDate").value = "";
+  document.getElementById("filterSeries").value = "";
+  document.getElementById("filterSupplier").value = "";
+  document.getElementById("filterEquipment").value = "";
+  updateTable(); // Reset table to show all entries
+}
+
+
+
+  function addPart() {
+  const container = document.getElementById("partsContainer");
+
+  const div = document.createElement("div");
+  div.className = "part-group";
+  div.style = "display:flex; align-items:center; gap:10px; margin-bottom:5px;";
+
+  div.innerHTML = `
+  <input type="text" class="part" placeholder="Part Name" style="flex:2"/>
+  <input type="number" class="cost" placeholder="Cost" style="flex:1"/>
+  <button type="button" class="btn-remove" onclick="removePart(this)">Remove</button>
+  <button type="button" class="btn-add" onclick="addPart()">Add Part</button>
+`;
+
+  container.appendChild(div);
+}
+
+function removePart(button) {
+  const container = document.getElementById("partsContainer");
+  if (container.children.length > 1) {
+    button.parentElement.remove();
+  } else {
+    alert("At least one part is required.");
+  }
+}
+
+// On page load, create the first part row
+window.onload = () => {
+  addPart();
+};
+
+
+  function saveToLocalStorage() {
+    localStorage.setItem("rfpLogisticsEntries", JSON.stringify(entries));
+  }
+
+  function getStaffPosition(signatory) {
+  if (signatory === "ANGELIKA C. CASTILLO") {
+    return "ADMIN STAFF";
+  } else if (signatory === "JAREN NICO TALAMPAS") {
+    return "PURCHASING STAFF";
+  }
+  return "";
+}
+
+  function postDetails() {
+  const parts = Array.from(document.querySelectorAll(".part-group")).map(pg => ({
+    part: pg.querySelector(".part").value,
+    cost: pg.querySelector(".cost").value
+  }));
+
+  const signatory = document.getElementById("signatory").value;
+
+  // Calculate subtotal
+  const subtotal = parts.reduce((sum, p) => sum + (Number(p.cost) || 0), 0);
+
+  const entry = {
+    date: document.getElementById("date").value,
+    requestor: document.getElementById("requestor").value,
+    series: document.getElementById("series").value,
+    rfNumber: document.getElementById("rfNumber").value,
+    equipment: document.getElementById("equipment").value,  // ✅ will now save correctly
+    supplier: document.getElementById("supplier").value,
+    parts: parts,
+    subtotal: subtotal, 
+    signatories: signatory,  // ✅ fixed wrong ID
+    staffPosition: getStaffPosition(signatory) // ✅ auto-generate staff position
+  };
+
+  if (!entry.date || !entry.requestor || !entry.series || !entry.rfNumber || !entry.supplier) {
+    alert("Please complete all required fields.");
+    return;
+  }
+
+  entries.push(entry);
+  entries.sort((a, b) => new Date(b.date) - new Date(a.date));
+  saveToLocalStorage();
+  updateTable();
+
+  // Reset form
+  document.querySelectorAll("input, textarea").forEach(el => el.value = "");
+  document.getElementById("partsContainer").innerHTML = "";
+  addPart();
+  document.getElementById("signatory").value = "";
+}
+
+
+  function downloadPDF(rowIndex) {
+  const { jsPDF } = window.jspdf;
+  const entry = entries[rowIndex];
+
+  const pdf = new jsPDF({ orientation: "portrait", unit: "px", format: "a4" });
+
+  const img = new Image();
+  img.src = "RFP.jpg";
+  img.crossOrigin = "anonymous";
+
+  img.onload = function () {
+    pdf.addImage(img, "JPEG", 0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
+
+    // Base positions
+    const positions = {
+      requestor: { x: 72, y: 77 },
+      date: { x: 42, y: 90 },
+      series: { x: 302, y: 77 },
+      rfNumber: { x: 300, y: 90 },
+      equipment: { x: 20, y: 114 },
+      parts: { x: 20, y: 129 },
+      costs: { x: 333, y: 129 },
+      supplier: { x: 85, y: 200 },
+      subtotal: { x: 333, y: 190 },
+      signatories: { x: 25, y: 248 },
+      staffPosition: { x: 35, y: 262 }
+    };
+
+    pdf.setFont("arial", "bold");
+    pdf.setFontSize(11);
+
+    const partsText = entry.parts.map(p => p.part).join("\n");
+    const costsText = entry.parts.map(p => Number(p.cost).toLocaleString()).join("\n");
+    const subtotal = entry.parts.reduce((sum, p) => sum + (Number(p.cost) || 0), 0);
+
+    // ✅ First (original) set
+    pdf.text(entry.requestor || "", positions.requestor.x, positions.requestor.y);
+    pdf.text(entry.date || "", positions.date.x, positions.date.y);
+    pdf.text(entry.series || "", positions.series.x, positions.series.y);
+    pdf.text(entry.rfNumber || "", positions.rfNumber.x, positions.rfNumber.y);
+    pdf.text(entry.equipment || "", positions.equipment.x, positions.equipment.y);
+    pdf.text(partsText || "", positions.parts.x, positions.parts.y);
+    pdf.text(costsText || "", positions.costs.x, positions.costs.y);
+    pdf.setFontSize(18);
+    pdf.text(subtotal.toLocaleString(), positions.subtotal.x, positions.subtotal.y);
+    pdf.setFontSize(11);
+    pdf.setTextColor(231, 76, 60);
+    pdf.text(entry.supplier || "", positions.supplier.x, positions.supplier.y);
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFontSize(9.5);
+    pdf.text(entry.signatories || "", positions.signatories.x, positions.signatories.y);
+    pdf.text((entry.staffPosition || "").toUpperCase(), positions.staffPosition.x, positions.staffPosition.y);
+
+    // ✅ Duplicate set (push down by 300px)
+    const offsetY = 317;
+    pdf.setFontSize(11);
+    pdf.text(entry.requestor || "", positions.requestor.x, positions.requestor.y + offsetY);
+    pdf.text(entry.date || "", positions.date.x, positions.date.y + offsetY);
+    pdf.text(entry.series || "", positions.series.x, positions.series.y + offsetY);
+    pdf.text(entry.rfNumber || "", positions.rfNumber.x, positions.rfNumber.y + offsetY);
+    pdf.text(entry.equipment || "", positions.equipment.x, positions.equipment.y + offsetY);
+    pdf.text(partsText || "", positions.parts.x, positions.parts.y + offsetY);
+    pdf.text(costsText || "", positions.costs.x, positions.costs.y + offsetY);
+    pdf.setFontSize(18);
+    pdf.text(subtotal.toLocaleString(), positions.subtotal.x, positions.subtotal.y + offsetY);
+    pdf.setFontSize(11);
+    pdf.setTextColor(231, 76, 60);
+    pdf.text(entry.supplier || "", positions.supplier.x, positions.supplier.y + offsetY);
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFontSize(9.5);
+    pdf.text(entry.signatories || "", positions.signatories.x, positions.signatories.y + offsetY);
+    pdf.text((entry.staffPosition || "").toUpperCase(), positions.staffPosition.x, positions.staffPosition.y + offsetY);
+
+    pdf.save(`RFP_${entry.date || "untitled"}.pdf`);
+  };
+
+  img.onerror = function () {
+    alert("RFP.jpg not found. Make sure the file exists and path is correct.");
+  };
+}
+
+
+
+  function updateTable() {
+  const tableBody = document.getElementById("dataBody");
+  tableBody.innerHTML = "";
+
+  let grandTotal = 0;
+
+  entries.forEach((entry, rowIndex) => {
+    const row = document.createElement("tr");
+
+    // Combine parts and costs into strings separated by line breaks
+    const partsText = entry.parts.map(p => p.part).join("\n");
+    const costsText = entry.parts.map(p => p.cost).join("\n");
+    const subtotal = entry.parts.reduce((sum, p) => sum + (Number(p.cost) || 0), 0);
+
+    grandTotal += subtotal;
+
+    row.innerHTML = `
+      <td>${entry.date}</td>
+      <td>${entry.requestor}</td>
+      <td>${entry.series}</td>
+      <td>${entry.rfNumber}</td>
+      <td>${entry.equipment}</td>
+      <td>${entry.supplier}</td>
+      <td style="white-space: pre-line;">${partsText}</td>
+      <td style="white-space: pre-line;">
+  ${entry.parts.map(p => "\u20B1 " + Number(p.cost).toLocaleString()).join("\n")}
+</td>
+<td>\u20B1 ${subtotal.toLocaleString()}</td>
+
+      <td>
+      <button style="background-color:#3498db; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; margin-bottom:5px;" onclick="editEntry(${rowIndex})">Edit</button>
+      <button style="background-color:#e74c3c; color:white; border:none; padding:10px 10px; border-radius:5px; cursor:pointer; margin-bottom:5px;" onclick="deleteEntry(${rowIndex})">Delete</button>
+      <button style="background-color:#27ae60; color:white; border:none; padding:10px 15px; border-radius:5px; cursor:pointer;" onclick="downloadPDF(${rowIndex})">Download</button>
+    </td>
+
+    `;
+
+    tableBody.appendChild(row);
+  });
+
+// Add Grand Total row
+if (entries.length > 0) {
+  const totalRow = document.createElement("tr");
+  totalRow.innerHTML = `
+    <td colspan="8" style="font-weight:bold; text-align:center;">GRAND TOTAL</td> <!-- Text on left -->
+    <td style="font-weight:bold; text-align:center;">\u20B1 ${grandTotal.toLocaleString()}</td>
+    <td></td> <!-- Empty Action column -->
+  `;
+  tableBody.appendChild(totalRow);
+}
+}
+
+
+function editEntry(entryIndex) {
+  const entry = entries[entryIndex];
+  document.getElementById("date").value = entry.date;
+  document.getElementById("requestor").value = entry.requestor;
+  document.getElementById("series").value = entry.series;
+  document.getElementById("rfNumber").value = entry.rfNumber;
+  document.getElementById("equipment").value = entry.equipment;
+  document.getElementById("supplier").value = entry.supplier;
+  document.getElementById("signatory").value = entry.signatories;
+
+  // Reload parts
+  const partsContainer = document.getElementById("partsContainer");
+  partsContainer.innerHTML = "";
+  entry.parts.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "part-group";
+    div.style = "display:flex; gap:10px; align-items:center; margin-bottom:5px;";
+    div.innerHTML = `
+  <input type="text" class="part" value="${p.part}" placeholder="Part Name" style="flex:2"/>
+  <input type="number" class="cost" value="${p.cost}" placeholder="Cost" style="flex:1"/>
+  <button type="button" class="btn-remove" onclick="removePart(this)">Remove</button>
+  <button type="button" class="btn-add" onclick="addPart()">Add Part</button>
+`; 
+    partsContainer.appendChild(div);
+  });
+
+  // 🔹 Regenerate staff position when editing
+  entry.staffPosition = getStaffPosition(entry.signatories);
+
+  entries.splice(entryIndex, 1);
+  saveToLocalStorage();
+  updateTable();
+}
+
+function deleteEntry(entryIndex) {
+  entries.splice(entryIndex, 1);
+  saveToLocalStorage();
+  updateTable();
+}
+
+
+  const authLink = document.getElementById("authLink");
+  const menuToggle = document.getElementById("menu-toggle");
+  const navLinks = document.getElementById("nav-links");
+
+  menuToggle.addEventListener("click", () => {
+    navLinks.classList.toggle("show");
+  });
+
+  function updateAuthUI() {
+    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+    if (isLoggedIn) {
+      authLink.textContent = "Logout";
+      authLink.onclick = () => {
+        const confirmLogout = confirm("Are you sure you want to logout?");
+        if (confirmLogout) {
+          localStorage.removeItem("isLoggedIn");
+          window.location.href = "../../login.html";
+        }
+      };
+    } else {
+      authLink.textContent = "Login";
+      authLink.onclick = () => {
+        window.location.href = "../../login.html";
+      };
+    }
+  }
+
+  function disableInteraction() {
+    document.querySelectorAll("input, textarea, button").forEach(el => {
+      el.disabled = true;
+      el.style.cursor = "not-allowed";
+    });
+    editingEnabled = false;
+    updateTable();
+  }
+
+  window.onload = () => {
+    updateTable();
+    addPart();
+    updateAuthUI();
+    if (localStorage.getItem("isLoggedIn") !== "true") {
+      disableInteraction();
+    }
+  };
+  
+</script>
+
+</main>
+<footer class="footer">
+  <p>&copy; Kurth Clarenze Lacsinto Novesteras. <br>All rights reserved.</p>
+</footer>
+</body>
+</html>

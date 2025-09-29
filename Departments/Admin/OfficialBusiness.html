@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Official Business</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Montserrat', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    main {
+      flex: 1;
+    }
+
+    nav {
+      background-color: #2c3e50;
+      padding: 15px 25px;
+      color: white;
+    }
+
+    .nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      font-size: 24px;
+      margin-top: 20px;
+    }
+
+    .form-container {
+      background: #2c3e50;
+      color: white;
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    textarea { resize: vertical; }
+
+    .button-wrapper {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .button-wrapper button {
+      background-color: #ffffff;
+      color: #2c3e50;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      max-width: 150px;
+      width: 100%;
+    }
+
+    .button-wrapper button:hover {
+      background-color: #ddd;
+    }
+
+    .table-wrapper {
+      overflow-x: auto; 
+      overflow-y: auto;
+      margin: 30px auto;
+      max-width: 1580px;
+      max-height: 500px; /* set max height to allow scrolling */
+      border: 1px solid #ccc;
+}
+
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1000px;
+      background-color: white;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    th {
+      background-color: #2c3e50;
+      color: white;
+    }
+
+    td[contenteditable="true"] { background-color: white; }
+    td.editing { outline: 2px solid #3498db; }
+
+    @media (max-width: 600px) {
+      nav {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      h1 { font-size: 20px; }
+
+      .form-container {
+        padding: 20px 15px;
+        margin: 15px;
+      }
+
+      input, textarea {
+        font-size: 13px;
+        padding: 8px;
+      }
+
+      .button-wrapper button { font-size: 15px; }
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .nav-item, .nav-item-button {
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      padding: 10px 15px;
+      background: none;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .nav-item:hover, .nav-item-button:hover {
+      background-color: white;
+      color: #2c3e50;
+    }
+
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      margin-left: auto;
+      gap: 4px;
+    }
+
+    .menu-toggle span {
+      height: 3px;
+      width: 25px;
+      background: white;
+      border-radius: 3px;
+    }
+
+    .nav-links.show {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: flex;
+      }
+
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        margin-top: 10px;
+      }
+
+      .nav-item {
+        width: 100%;
+        padding: 10px 0;
+      }
+    }
+
+    .back-button {
+      display: block;
+      margin: 10px 20px 0;
+      text-align: left;
+      background-color: #2c3e50;
+      color: white;
+      padding: 10px 25px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      text-decoration: none;
+      width: fit-content;
+    }
+
+    .back-button:hover {
+      background-color: #34495e;
+    }
+
+    .footer {
+      background-color: #2c3e50;
+      color: white;
+      text-align: center;
+      padding: 15px 20px;
+      position: relative;
+      bottom: 0;
+      width: 100%;
+      margin-top: 40px;
+    }
+
+    input:disabled,
+    textarea:disabled,
+    button:disabled {
+      background-color: #ccc;
+      color: #555;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    #passwordModal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  font-family: 'Montserrat', sans-serif;
+}
+
+#passwordModal .modal-content {
+  background: white;
+  padding: 20px 25px;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 320px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+#passwordModal input[type="password"] {
+  padding: 10px;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+#passwordModal button {
+  padding: 8px 16px;
+  margin: 5px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#passwordModal button:first-child {
+  background-color: #2c3e50;
+  color: white;
+}
+
+#passwordModal button:last-child {
+  background-color: #bdc3c7;
+  color: black;
+}
+input[type="date"] {
+  width: 150px; /* adjust as needed */
+}
+
+
+  </style>
+</head>
+<body>
+<main>
+<header>
+<nav>
+  <div class="nav-container">
+    <div class="logo">RD8 BUILDERS</div>
+
+    <div class="menu-toggle" id="menu-toggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+
+    <div class="nav-links" id="nav-links">
+        <a href="../../Index.html" class="nav-item">Home</a>
+        <a href="../../AboutUs.html" class="nav-item">About Us</a>
+        <a href="../../CompanyProfile.html" class="nav-item">Company Profile</a> <!-- Always accessible -->
+        <a href="../../ContactUs.html" class="nav-item">Contact Us</a>
+      <a href="#" class="nav-item" id="authLink">Login</a>
+    </div>
+  </div>
+</nav>
+
+<a class="back-button" href="admin.html">← Back to Admin</a>
+</header>
+
+<h1>OFFICIAL BUSINESS</h1>
+
+<div class="form-container">
+  <div class="form-group"><label for="date">Date:</label><input type="date" id="date" /></div>
+  <div class="form-group"><label for="name">Passenger</label><input type="text" id="name" /></div>
+  <div class="form-group"><label for="driver">Driver:</label><input type="text" id="driver" /></div>
+  <div class="form-group"><label for="vehicleType">Vehicle Type:</label><input type="text" id="vehicleType" /></div>
+  <div class="form-group"><label for="plateNumber">Vehicle Plate Number:</label><input type="text" id="plateNumber" /></div>
+  <div class="form-group"><label for="purpose">Purpose:</label><textarea id="purpose" rows="1"></textarea></div>
+  <div class="form-group"><label for="routes">Planned Routes:</label><textarea id="routes" rows="1"></textarea></div>
+  <div class="form-group"><label for="gasPercentage">Gas Percentage:</label><input type="number" id="gasPercentage" placeholder="e.g., 70%" /></div>
+  <div class="form-group"><label for="etd">ETD (Departure Time):</label><input type="time" id="etd" /></div>
+  <div class="form-group"><label for="eta">ETA (Arrival Time):</label><input type="time" id="eta" /></div>
+  <div class="form-group"><label for="odoDepart">Departure Odometer:</label><input type="number" id="odoDepart" /></div>
+  <div class="form-group"><label for="odoArrive">Arrival Odometer:</label><input type="number" id="odoArrive" /></div>
+
+  <div class="button-wrapper">
+    <button onclick="postDetails()">Submit</button>
+    <button onclick="toggleEditMode()">Edit Mode</button>
+  </div>
+</div>
+
+<div class="table-wrapper">
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th><th>Passenger</th><th>Driver</th><th>Vehicle Type</th><th>Plate Number</th><th>Purpose</th><th>Routes</th><th>Gas %</th><th>ETD</th><th>ETA</th><th>Odo Start</th><th>Odo End</th><th>Remove</th><th>Download</th>
+      </tr>
+    </thead>
+    <tbody id="dataBody"></tbody>
+  </table>
+</div>
+
+<div style="text-align: center; margin: 20px;">
+  <label>From: <input type="date" id="fromDate"></label>
+  <label>To: <input type="date" id="toDate"></label>
+  <br><br>
+  <button onclick="downloadExcel()" style="
+    background-color: #2c3e50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+  ">Download Excel</button>
+</div>
+
+<!-- Password Input Modal — securely masks password -->
+<div id="passwordModal">
+  <div class="modal-content">
+    <p id="passwordPromptText" style="margin-bottom:10px;">Enter password:</p>
+    <input type="password" id="passwordInput" />
+    <div>
+      <button onclick="submitPassword()">Submit</button>
+      <button onclick="cancelPassword()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ✂️ keep everything else above unchanged -->
+
+<script>
+  const entries = JSON.parse(localStorage.getItem("officialBusinessEntries") || "[]");
+  let editingEnabled = false;
+  const editPassword = "admin123";
+
+  // Password modal logic
+  let passwordCallback = null;
+  function askPassword(message, callback) {
+    document.getElementById("passwordPromptText").innerText = message;
+    document.getElementById("passwordInput").value = "";
+    document.getElementById("passwordModal").style.display = "flex";
+    passwordCallback = callback;
+  }
+  function submitPassword() {
+    const input = document.getElementById("passwordInput").value;
+    document.getElementById("passwordModal").style.display = "none";
+    if (passwordCallback) passwordCallback(input);
+  }
+  function cancelPassword() {
+    document.getElementById("passwordModal").style.display = "none";
+    if (passwordCallback) passwordCallback(null);
+  }
+
+  function saveToLocalStorage() {
+    localStorage.setItem("officialBusinessEntries", JSON.stringify(entries));
+  }
+
+  function postDetails() {
+    askPassword("Enter password to submit:", (password) => {
+      if (password !== editPassword) {
+        alert("Incorrect password.");
+        return;
+      }
+      const entry = {
+        date: document.getElementById("date").value,
+        name: document.getElementById("name").value.trim(),
+        driver: document.getElementById("driver").value.trim(),
+        vehicleType: document.getElementById("vehicleType").value.trim(),
+        plateNumber: document.getElementById("plateNumber").value.trim(),
+        purpose: document.getElementById("purpose").value.trim(),
+        routes: document.getElementById("routes").value.trim(),
+        gasPercentage: document.getElementById("gasPercentage").value.trim(),
+        etd: document.getElementById("etd").value,
+        eta: document.getElementById("eta").value,
+        odoDepart: document.getElementById("odoDepart").value,
+        odoArrive: document.getElementById("odoArrive").value
+      };
+      if (!entry.date || !entry.name || !entry.driver || !entry.vehicleType || !entry.plateNumber) {
+        alert("Please complete all required fields.");
+        return;
+      }
+      entries.push(entry);
+      entries.sort((a, b) => new Date(b.date) - new Date(a.date));
+      saveToLocalStorage();
+      updateTable();
+
+      document.querySelectorAll("input, textarea").forEach(el => el.value = "");
+    });
+  }
+
+    // 🆕 PDF Generator for OB Form
+function downloadPDF(row) {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: "portrait", unit: "px", format: "a4" });
+
+    // List of possible image names to try
+    const possibleImages = [
+        "OB.jpeg",
+        "OB.jpg",
+        "OB Form.jpg",
+        "OB%20Form.jpg",
+        "OB_Form.jpg"
+    ];
+
+    // Try loading images one by one
+    function tryImage(index) {
+        if (index >= possibleImages.length) {
+            console.warn("No OB form image found — using text only.");
+            fillTextOnly();
+            return;
+        }
+
+        const img = new Image();
+        img.crossOrigin = "anonymous"; // For local server safety
+        img.src = possibleImages[index];
+
+        img.onload = function () {
+            console.log("Loaded OB form image:", possibleImages[index]);
+            pdf.addImage(img, "JPEG", 0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
+            fillTextOnly();
+        };
+
+        img.onerror = function () {
+            console.warn("Image not found:", possibleImages[index]);
+            tryImage(index + 1); // Try the next one
+        };
+    }
+
+    // Text fill function
+    function fillTextOnly() {
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(10);
+
+  const formatTime = (timeStr) => {
+    if (!timeStr) return "";
+    const [hourStr, minuteStr] = timeStr.split(":");
+    let hour = parseInt(hourStr);
+    const minute = minuteStr;
+    const ampm = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12 || 12;
+    return `${hour}:${minute} ${ampm}`;
+  };
+
+  const etdFormatted = formatTime(row.etd);
+  const etaFormatted = formatTime(row.eta);
+
+  // page 1
+  pdf.text(row.name || "", 35, 60);
+  pdf.text(row.date || "", 340, 60);
+  pdf.text(row.driver || "", 312, 71);
+  pdf.text((row.vehicleType || "") + " / " + (row.plateNumber || ""), 122, 71);
+  pdf.text(row.purpose || "", 40, 100, { maxWidth: 380 });
+  pdf.text(row.routes || "", 70, 171, { maxWidth: 380 });
+  pdf.text(etdFormatted, 70, 156);
+  pdf.text(etaFormatted, 340, 155);
+
+  // page 2
+  pdf.text(row.name || "", 35, 378);
+  pdf.text(row.date || "", 340, 378);
+  pdf.text(row.driver || "", 312, 389);
+  pdf.text((row.vehicleType || "") + " / " + (row.plateNumber || ""), 122, 389);
+  pdf.text(row.purpose || "", 40, 418, { maxWidth: 380 });
+  pdf.text(row.routes || "", 70, 489, { maxWidth: 380 });
+  pdf.text(etdFormatted, 70, 474);
+  pdf.text(etaFormatted, 340, 473);
+
+  pdf.save(`official_business_${row.date}_${row.name.replace(/\s+/g, "_")}.pdf`);
+}
+
+
+    // Start trying images
+    tryImage(0);
+}
+
+function formatTimeToAMPM(timeStr) {
+  if (!timeStr) return "";
+  const [hourStr, minuteStr] = timeStr.split(":");
+  let hour = parseInt(hourStr);
+  const ampm = hour >= 12 ? "PM" : "AM";
+  hour = hour % 12 || 12;
+  return `${hour}:${minuteStr} ${ampm}`;
+}
+
+
+  function updateTable() {
+  const tableBody = document.getElementById("dataBody");
+  tableBody.innerHTML = "";
+
+  entries.forEach((entry, rowIndex) => {
+    const row = document.createElement("tr");
+
+    // Populate normal entry fields
+    Object.keys(entry).forEach((key) => {
+      const cell = document.createElement("td");
+      if (key === "etd" || key === "eta") {
+  cell.innerText = formatTimeToAMPM(entry[key]);
+} else {
+  cell.innerText = entry[key];
+}
+      if (editingEnabled) {
+        cell.contentEditable = true;
+        cell.classList.add("editing");
+        cell.addEventListener("input", () => {
+          entries[rowIndex][key] = cell.innerText;
+          saveToLocalStorage();
+        });
+      } else {
+        cell.contentEditable = false;
+        cell.classList.remove("editing");
+      }
+      row.appendChild(cell);
+    });
+
+    // Remove Button Column
+    const removeCell = document.createElement("td");
+    const removeBtn = document.createElement("button");
+    removeBtn.textContent = "Remove";
+    Object.assign(removeBtn.style, {
+      background: "#e74c3c",
+      color: "white",
+      border: "none",
+      padding: "5px 10px",
+      cursor: "pointer",
+      borderRadius: "4px"
+    });
+    removeBtn.onclick = () => {
+      askPassword("Enter admin password to remove this entry:", (password) => {
+        if (password === editPassword) {
+          entries.splice(rowIndex, 1);
+          saveToLocalStorage();
+          updateTable();
+        } else {
+          alert("Incorrect password.");
+        }
+      });
+    };
+    removeCell.appendChild(removeBtn);
+    row.appendChild(removeCell);
+
+    // Download Button Column
+    const downloadCell = document.createElement("td");
+    const downloadBtn = document.createElement("button");
+    downloadBtn.textContent = "Download";
+    Object.assign(downloadBtn.style, {
+      background: "#3498db",
+      color: "white",
+      border: "none",
+      padding: "5px 10px",
+      cursor: "pointer",
+      borderRadius: "4px"
+    });
+    // 🆕 Make download button export PDF
+downloadBtn.onclick = () => {
+  askPassword("Enter admin password to download this entry:", (password) => {
+      if (password !== editPassword) {
+          alert("Incorrect password.");
+          return;
+      }
+      const row = entries[rowIndex];
+      downloadPDF(row); // 🆕 Use our PDF function
+  });
+};
+
+    downloadCell.appendChild(downloadBtn);
+    row.appendChild(downloadCell);
+
+    tableBody.appendChild(row);
+  });
+}
+
+
+  function toggleEditMode() {
+    if (!editingEnabled) {
+      askPassword("Enter admin password to enable edit mode:", (password) => {
+        if (password !== editPassword) {
+          alert("Incorrect password.");
+          return;
+        }
+        editingEnabled = true;
+        updateTable();
+      });
+    } else {
+      editingEnabled = false;
+      updateTable();
+    }
+  }
+
+function downloadExcel() {
+  askPassword("Enter password to download:", (password) => {
+    if (password !== editPassword) {
+      alert("Incorrect password.");
+      return;
+    }
+
+    const fromDate = document.getElementById("fromDate").value;
+    const toDate = document.getElementById("toDate").value;
+
+    let rows = [];
+    let allRows = Array.from(document.querySelector("table").querySelectorAll("tr"));
+
+    // Always include header
+    rows.push(allRows[0]);
+
+    // Loop through table rows and filter by date range
+    for (let i = 1; i < allRows.length; i++) {
+      let dateCell = allRows[i].querySelector("td");
+      if (!dateCell) continue;
+      let rowDate = dateCell.innerText;
+
+      if ((!fromDate || rowDate >= fromDate) && (!toDate || rowDate <= toDate)) {
+        rows.push(allRows[i]);
+      }
+    }
+
+    if (rows.length <= 1) {
+      alert("No records found in the selected date range.");
+      return;
+    }
+
+    let csvContent = rows.map(row => {
+      let cells = Array.from(row.querySelectorAll("th, td"));
+      return cells.map(cell => `"${cell.innerText.replace(/"/g, '""')}"`).join(",");
+    }).join("\n");
+
+    let blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement("a");
+    a.href = url;
+    a.download = "official_business_report.csv";
+    a.click();
+  });
+}
+
+
+  const authLink = document.getElementById("authLink");
+  const menuToggle = document.getElementById("menu-toggle");
+  const navLinks = document.getElementById("nav-links");
+
+  menuToggle.addEventListener("click", () => {
+    navLinks.classList.toggle("show");
+  });
+
+  function updateAuthUI() {
+    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+    if (isLoggedIn) {
+      authLink.textContent = "Logout";
+      authLink.onclick = () => {
+        const confirmLogout = confirm("Are you sure you want to logout?");
+        if (confirmLogout) {
+          localStorage.removeItem("isLoggedIn");
+          window.location.href = "../../login.html";
+        }
+      };
+    } else {
+      authLink.textContent = "Login";
+      authLink.onclick = () => {
+        window.location.href = "../../login.html";
+      };
+    }
+  }
+
+  function disableInteraction() {
+    document.querySelectorAll("input, textarea, button").forEach(el => {
+      el.disabled = true;
+      el.style.cursor = "not-allowed";
+    });
+    editingEnabled = false;
+    updateTable();
+  }
+
+  window.onload = () => {
+    updateTable();
+    updateAuthUI();
+    if (localStorage.getItem("isLoggedIn") !== "true") {
+      disableInteraction();
+    }
+  };
+  
+</script>
+
+</main>
+<footer class="footer">
+  <p>&copy; Kurth Clarenze Lacsinto Novesteras. <br>All rights reserved.</p>
+</footer>
+</body>
+</html>
