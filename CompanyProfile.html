@@ -24,6 +24,13 @@
     header {
       background-color: #2c3e50;
     }
+      
+    h1 {
+      font-size: 30px;
+      color: #2c3e50;
+      text-align: center;
+      padding: 20px 20px 20px 20px;
+    }
 
     nav {
       max-width: 1200px;
@@ -153,11 +160,84 @@
       }
     }
 
-      h1 {
-      font-size: 30px;
-      color: #2c3e50;
+    /* Flipbook styles */
+    .flipbook-container {
+      perspective: 1000px;
+      width: 90%;
+      max-width: 800px;
+      margin: 20px auto;
+      position: relative;
+    }
+
+    .flipbook-page {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      transform-style: preserve-3d;
+      transition: transform 0.6s ease-in-out;
+    }
+
+    .flipbook-image {
+      width: 50%;
+      object-fit: cover;
+      height: auto;
+      transition: opacity 0.3s ease-in-out;
+      border-radius: 10px;
+      backface-visibility: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .flipbook-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: #2c3e50;
+      color: white;
+      border: none;
+      font-size: 24px;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .flipbook-btn:hover {
+      background-color: #1abc9c;
+    }
+
+    .flipbook-btn.left {
+      left: -100px;
+    }
+
+    .flipbook-btn.right {
+      right: -100px;
+    }
+
+    #pageNumber {
       text-align: center;
-      padding: 20px 20px 20px 20px;
+      margin-top: 10px;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    @media (max-width: 600px) {
+      .flipbook-btn.left {
+        left: 0;
+      }
+
+      .flipbook-btn.right {
+        right: 0;
+      }
+
+      .flipbook-page {
+        flex-direction: row;
+        gap: 5px;
+      }
+
+      .flipbook-image {
+        width: 48%;
+      }
     }
   </style>
 </head>
@@ -166,19 +246,14 @@
   <header>
     <nav>
       <div class="logo">RD8 BUILDERS CORP</div>
-
       <div class="menu-toggle" id="menu-toggle">
-        <span></span>
-        <span></span>
-        <span></span>
+        <span></span><span></span><span></span>
       </div>
-
       <div class="nav-links" id="nav-links">
         <a href="Index.html" class="nav-item">Home</a>
         <a href="AboutUs.html" class="nav-item">About Us</a>
         <a href="CompanyProfile.html" class="nav-item">Company Profile</a>
         <a href="ContactUs.html" class="nav-item">Contact Us</a>
-
         <div class="dropdown" id="deptDropdown" style="display: none;">
           <button class="nav-item-button">Departments▾</button>
           <div class="dropdown-content">
@@ -194,51 +269,40 @@
             <a href="Departments/Purchasing/Purchasing.html">Purchasing Department</a>
           </div>
         </div>
-
         <a href="#" class="nav-item" id="authLink">Login</a>
       </div>
     </nav>
   </header>
 
-  <main style="flex: 1; padding: 40px 20px; max-width: 900px; margin: auto;">
-    <h1 style="font-size: 32px; margin-bottom: 20px; color: #2c3e50;">CONTACT US</h1>
+    <h1>RD8 COMPANY PROFILE</h1>
 
-    <p style="font-size: 18px; margin-bottom: 30px; text-align: center;">
-      For inquiries, project collaborations, or business proposals, feel free to reach out to us through the following contact details:
-    </p>
-
-    <div style="font-size: 18px; line-height: 1.8; text-align: center;">
-      <p><strong>Email:</strong> <a href="https://mail.google.com/mail/?view=cm&fs=1&to=rd8builderscorp@gmail.com" target="_blank" style="color: #1abc9c;">rd8builderscorp@gmail.com</a></p>
-      <p><strong>Phone Number / Viber:</strong> +639054439888 | +639493368886</p>
-      <p><strong>Address:</strong> Artery Road, Zone 5, Brgy. San Isidro, Tarlac City, Tarlac</p>
+  <!-- 🔁 Flipbook section -->
+  <div class="flipbook-container" id="flipbook">
+    <button class="flipbook-btn left" onclick="prevPage()">❮</button>
+    <div class="flipbook-page">
+      <img id="leftPage" class="flipbook-image" src="CP/1.jpg" alt="Left Page">
+      <img id="rightPage" class="flipbook-image" src="CP/2.jpg" alt="Right Page">
     </div>
-
-    <div style="margin-top: 40px;">
-      <h2 style="font-size: 24px; color: #2c3e50; text-align: center;">Send Us a Message</h2>
-      <form id="contactForm" style="margin-top: 20px;">
-        <input type="text" id="name" placeholder="Your Name" required style="width: 100%; padding: 10px; margin-bottom: 10px;" />
-        <input type="email" id="email" placeholder="Your Email" required style="width: 100%; padding: 10px; margin-bottom: 10px;" />
-        <textarea id="message" placeholder="Your Message" rows="5" required style="width: 100%; padding: 10px; margin-bottom: 10px;"></textarea>
-        <button type="submit" style="background-color: #2c3e50; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 6px;">Send</button>
-      </form>
-    </div>
-  </main>
+    <button class="flipbook-btn right" onclick="nextPage()">❯</button>
+    <br>
+    <div id="pageNumber">Pages 1–2 of 44</div>
+  </div>
 
   <footer class="footer">
-    <p>&copy; Kurth Clarenze Lacsinto Novesteras. All rights reserved.</p>
+    <p>&copy; Kurth Clarenze Lacsinto Novesteras. <br> All rights reserved.</p>
   </footer>
 
   <script>
-    const authLink = document.getElementById("authLink");
-    const deptDropdown = document.getElementById("deptDropdown");
-    const menuToggle = document.getElementById("menu-toggle");
-    const navLinks = document.getElementById("nav-links");
+  const authLink = document.getElementById("authLink");
+  const deptDropdown = document.getElementById("deptDropdown");
+  const menuToggle = document.getElementById("menu-toggle");
+  const navLinks = document.getElementById("nav-links");
 
-    menuToggle.addEventListener("click", () => {
-      navLinks.classList.toggle("show");
-    });
+  menuToggle.addEventListener("click", () => {
+    navLinks.classList.toggle("show");
+  });
 
-    function updateAuthUI() {
+  function updateAuthUI() {
     const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
     const role = localStorage.getItem("userRole");
     const allLinks = deptDropdown.querySelectorAll(".dropdown-content a");
@@ -282,21 +346,91 @@
 
   updateAuthUI();
 
-    // Dynamic Gmail redirect on form submit
-    document.getElementById("contactForm").addEventListener("submit", function(event) {
-  event.preventDefault();
+  const images = [];
+  for (let i = 1; i <= 44; i++) {
+    const img = new Image();
+    img.src = `CP/${i}.jpg`;
+    images.push(img.src);
+  }
 
-  const name = encodeURIComponent(document.getElementById("name").value);
-  const email = encodeURIComponent(document.getElementById("email").value);
-  const message = encodeURIComponent(document.getElementById("message").value);
+  let current = 0;
+  const leftImg = document.getElementById("leftPage");
+  const rightImg = document.getElementById("rightPage");
+  const pageNumber = document.getElementById("pageNumber");
 
-  const recipient = "rd8builderscorp@gmail.com";
-  const subject = `Message from ${name}`;
-  const body = `From: ${name} (%0AEmail: ${email})%0A%0A${message}`;
+  function showPages(index) {
+    const total = images.length;
 
-  const gmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=${recipient}&su=${subject}&body=${body}`;
-  window.open(gmailURL, "_blank");
-});
+    if (index < 0) index = 0;
+    if (index >= total) index = total - (total % 2 === 0 ? 2 : 1);
+    current = index;
+
+if (index === 0) {
+  leftImg.src = images[0];
+  leftImg.style.display = "block";
+  rightImg.style.display = "none";
+  leftImg.style.width = "50%";
+  pageNumber.textContent = `Page 1 of ${total}`;
+  document.querySelector(".flipbook-page").style.justifyContent = "center"; // ✅ center
+} else if (index >= total - 1) {
+  leftImg.style.display = "none";
+  rightImg.src = images[total - 1];
+  rightImg.style.display = "block";
+  rightImg.style.width = "50%";
+  pageNumber.textContent = `Page ${total} of ${total}`;
+  document.querySelector(".flipbook-page").style.justifyContent = "center"; // ✅ center
+} else {
+  leftImg.style.display = "block";
+  rightImg.style.display = "block";
+  leftImg.style.width = "50%";
+  rightImg.style.width = "50%";
+  leftImg.src = images[index];
+  rightImg.src = images[index + 1];
+  pageNumber.textContent = `Pages ${index + 1}–${index + 2} of ${total}`;
+  document.querySelector(".flipbook-page").style.justifyContent = "space-between"; // ✅ reset
+}
+
+
+    leftImg.style.opacity = 0;
+    rightImg.style.opacity = 0;
+    setTimeout(() => {
+      leftImg.style.opacity = 1;
+      rightImg.style.opacity = 1;
+    }, 100);
+  }
+
+  function nextPage() {
+    if (current === 0) {
+      showPages(1);
+    } else {
+      showPages(current + 2);
+    }
+  }
+
+  function prevPage() {
+    if (current === 1) {
+      showPages(0);
+    } else {
+      showPages(current - 2);
+    }
+  }
+
+  showPages(current);
+
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  [leftImg, rightImg].forEach(img => {
+    img.addEventListener("touchstart", (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+
+    img.addEventListener("touchend", (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      if (touchEndX < touchStartX - 50) nextPage();
+      if (touchEndX > touchStartX + 50) prevPage();
+    });
+  });
   </script>
 
 </body>
