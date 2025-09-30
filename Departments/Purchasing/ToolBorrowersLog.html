@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tool Borrowers Log</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; display: flex; flex-direction: column; font-family: 'Montserrat', sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+  main { flex: 1; }
+
+  nav { background-color: #2c3e50; padding: 15px 25px; color: white; }
+  .nav-container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+  .logo { font-size: 20px; font-weight: 700; color: white; }
+  .nav-links { display: flex; flex-wrap: wrap; gap: 15px; }
+  .nav-item { color: white; text-decoration: none; font-size: 16px; padding: 10px 15px; background: none; border: none; border-radius: 6px; cursor: pointer; }
+  .nav-item:hover { background-color: white; color: #2c3e50; }
+  @media (max-width: 768px) { 
+    .nav-links { display: none; flex-direction: column; width: 100%; margin-top: 10px; } 
+    .nav-item { width: 100%; padding: 10px 0; } 
+  }
+
+  .back-button { display: block; margin: 10px 20px 0; text-align: left; background-color: #2c3e50; color: white; padding: 10px 25px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; text-decoration: none; width: fit-content; }
+  .back-button:hover { background-color: #34495e; }
+
+  h1 { text-align: center; color: #2c3e50; font-size: 24px; margin-top: 20px; }
+
+  .form-container { background: #2c3e50; color: white; max-width: 600px; margin: 20px auto; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+  .form-group { margin-bottom: 15px; }
+  label { display: block; font-weight: bold; margin-bottom: 5px; color: #ffffff; }
+  input { width: 100%; padding: 10px; border: none; border-radius: 6px; font-size: 14px; }
+
+  .button-wrapper { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+  .button-wrapper button { background-color: #ffffff; color: #2c3e50; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; max-width: 150px; width: 100%; }
+  .button-wrapper button:hover { background-color: #ddd; }
+
+  .footer { background-color: #2c3e50; color: white; text-align: center; padding: 15px 20px; margin-top: 40px; }
+
+  .top-button-wrapper { display: flex; justify-content: center; margin-top: 20px; gap: 15px; flex-wrap: wrap; }
+  .toggle-form-btn { background-color: #2c3e50; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: 600; transition: background 0.18s; min-width:140px; }
+  .toggle-form-btn:hover { background-color: #34495e; }
+
+  #tb_addsiteFormWrapper, #tb_addToolFormWrapper, #tb_borrowToolFormWrapper { max-width: 700px; width: 100%; margin-bottom: 15px; }
+
+    /* Only this dropdown */
+  #tb_borrowToolName {
+    padding: 14px 16px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    width: 100%;
+    max-width: 650px;
+    text-align: center;
+    text-align-last: center; /* centers selected text */
+  }
+
+/* Available Tools Container */
+#availableToolsWrapper {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  max-width: 600px;
+  margin: 25px auto;
+  padding: 25px 20px;
+  transition: all 0.3s ease;
+}
+
+#availableToolsWrapper h3 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  color: #2c3e50;
+  letter-spacing: 0.5px;
+}
+
+/* List styling */
+#availableToolsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#availableToolsList li {
+  padding: 14px 20px;
+  margin-bottom: 12px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  font-size: 15px;
+  color: #2c3e50;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+#availableToolsList li:first-child {
+  margin-top: 0;
+}
+
+#availableToolsList li.site-header {
+  background: #2c3e50;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 16px;
+  justify-content: center;
+}
+
+#availableToolsList li:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+  background: #f0f3f7;
+}
+
+/* Borrowed / Available status */
+#availableToolsList li span {
+  flex: 1;
+  font-weight: 500;
+}
+
+#availableToolsList li span.borrowed {
+  color: #e67e22; /* orange for borrowed */
+  font-style: italic;
+}
+
+#availableToolsList li span.available {
+  color: #27ae60; /* green for available */
+  font-weight: 600;
+}
+
+
+
+
+/* Delete button styling */
+.delete-tool-btn {
+  background: #e74c3c;
+  border: none;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.delete-tool-btn:hover {
+  background: #c0392b;
+  transform: scale(1.05);
+}
+
+/* Hide button wrapper */
+#availableToolsWrapper .toggle-form-btn.small-btn {
+  padding: 10px 18px;
+  font-size: 14px;
+  background-color: #2c3e50;
+  color: white;
+  border-radius: 6px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+#availableToolsWrapper .toggle-form-btn.small-btn:hover {
+  background-color: #34495e;
+  transform: translateY(-1px);
+}
+
+#availableToolsList li span {
+  font-family: 'Poppins', sans-serif; /* Change the font */
+  font-size: 15px;   /* optional, adjust size */
+  font-weight: 500;  /* optional: normal 400, medium 500, bold 600 */
+}
+
+/* Modal Background */
+.modal {
+  display: none; 
+  position: fixed; 
+  z-index: 1000; 
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%;
+  background: rgba(0,0,0,0.6); 
+  justify-content: center;
+  align-items: center;
+}
+
+/* Modal Content Box */
+.modal-content {
+  background: #fff;
+  padding: 20px 25px;
+  border-radius: 12px;
+  width: 320px;
+  max-width: 90%;
+  text-align: center;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+  animation: popUp 0.25s ease;
+}
+
+/* Close (X) button */
+.close {
+  position: absolute;
+  top: 12px;
+  right: 20px;
+  font-size: 20px;
+  cursor: pointer;
+  color: #888;
+}
+.close:hover {
+  color: #333;
+}
+
+/* Buttons */
+.confirm-btn {
+  background: #e74c3c;
+  border: none;
+  color: #fff;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+.confirm-btn:hover {
+  background: #c0392b;
+}
+
+.cancel-btn {
+  background: #7f8c8d;
+  border: none;
+  color: #fff;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.cancel-btn:hover {
+  background: #606060;
+}
+
+/* Pop-up Animation */
+@keyframes popUp {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.loc-select {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  max-width: 600px;       /* match form-container */
+  margin: 20px auto;      /* center horizontally */
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;    /* centers label + select */
+}
+
+.loc-select label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #2c3e50;
+  text-align: center;
+}
+
+.loc-select select {
+  display: block;
+  margin: 0 auto;          /* centers the select box */
+  width: auto;             /* shrink to fit content */
+  min-width: 200px;        /* optional: keep it wide enough */
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  text-align: center;      /* centers text inside options */
+  text-align-last: center; /* centers selected text */
+}
+
+
+#locDropdown {
+  text-align: center;     /* centers the text */
+  text-align-last: center; /* centers the selected option */
+}
+
+.table-container {
+  margin: 30px auto;
+  max-width: 900px;
+  text-align: center;
+}
+
+#borrowTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#borrowTable th, #borrowTable td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+#borrowTable th {
+  background: #2c3e50;
+  color: white;
+}
+
+#deleteLocationBtn {
+  display: none;            /* stays hidden initially */
+  background: #e74c3c;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin: 15px auto 0 auto; /* centers horizontally */
+  text-align: center;
+  width: auto !important;   /* override the toggle-form-btn width */
+  max-width: 200px;
+}
+
+/* Borrow Table Action Buttons */
+#borrowTable td button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+  margin: 2px;
+}
+
+/* Return Button */
+#borrowTable td button:nth-child(1) {
+  background-color: #27ae60;  /* green */
+  color: #fff;
+}
+#borrowTable td button:nth-child(1):hover {
+  background-color: #1e8449;
+}
+
+/* Delete Button */
+#borrowTable td button:nth-child(2) {
+  background-color: #e74c3c;  /* red */
+  color: #fff;
+}
+#borrowTable td button:nth-child(2):hover {
+  background-color: #c0392b;
+}
+
+
+</style>
+
+<script>
+// ---------------- LOGIN ENFORCEMENT ----------------
+(function enforceLogin() {
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  const userRole = localStorage.getItem("userRole");
+  if (!isLoggedIn || (userRole !== "master" && userRole !== "purchasing")) {
+    document.documentElement.innerHTML = '<body style="background:#fff; margin:0"></body>';
+    window.location.replace("../../login.html");
+  }
+})();
+
+</script>
+
+</head>
+<body>
+<main>
+<header>
+<nav>
+  <div class="nav-container">
+    <div class="logo">RD8 BUILDERS CORP</div>
+    <div class="nav-links" id="nav-links">
+      <a href="../../Index.html" class="nav-item">Home</a>
+      <a href="../../AboutUs.html" class="nav-item">About Us</a>
+      <a href="../../CompanyProfile.html" class="nav-item">Company Profile</a>
+      <a href="../../ContactUs.html" class="nav-item">Contact Us</a>
+      <a href="#" class="nav-item" id="authLink">Login</a>
+    </div>
+  </div>
+</nav>
+<a class="back-button" href="Purchasing.html">← Back to Purchasing</a>
+</header>
+
+<h1>Tool Borrowers Log</h1>
+
+<!-- Top buttons row -->
+<div class="top-button-wrapper">
+  <button class="toggle-form-btn" onclick="showSiteForm()">Add Location</button>
+  <button class="toggle-form-btn" onclick="showToolForm()">Add Tool Name</button>
+  <button class="toggle-form-btn" onclick="showBorrowToolForm()">Borrow Tool</button>
+  <button class="toggle-form-btn" onclick="viewAvailableTools()">Available Tools</button>
+</div>
+
+<!-- Add Site form -->
+<div id="tb_addsiteFormWrapper" class="form-container" style="display:none;">
+  <div class="form-group">
+    <label>Location / Site:</label>
+    <input type="text" id="tb_siteLocation" placeholder="Enter site location">
+  </div>
+  <div class="button-wrapper">
+    <button onclick="postSite()">Submit</button>
+    <button onclick="hideSiteForm()">Hide Form</button>
+  </div>
+</div>
+
+<!-- Add Tool form -->
+<div id="tb_addToolFormWrapper" class="form-container" style="display:none;">
+  <div class="form-group">
+    <label>Tool Name:</label>
+    <input type="text" id="tb_toolName" placeholder="Enter tool name">
+  </div>
+  <div class="button-wrapper">
+    <button onclick="postTool()">Submit</button>
+    <button onclick="hideToolForm()">Hide Form</button>
+  </div>
+</div>
+
+<!-- Available Tools List -->
+<div id="availableToolsWrapper" style="display:none;">
+  <h3>Available Tools</h3>
+  <ul id="availableToolsList"></ul>
+  <div style="text-align:center; margin-top:15px;">
+    <button class="toggle-form-btn small-btn" onclick="hideAvailableTools()">Hide</button>
+  </div>
+</div>
+
+
+<!-- Location Dropdown (hidden at first) -->
+<div id="locDropdownWrapper" class="loc-select" style="display:none;">
+  <label for="locDropdown">Location</label>
+  <select id="locDropdown" onchange="onLocationSelected()">
+    <option value="">- Select Location -</option>
+  </select>
+</div>
+
+<button id="deleteLocationBtn" 
+        class="toggle-form-btn" 
+        style="background:#e74c3c; color:white; max-width:200px; margin-top:15px; display:none; align-items: center;" 
+        onclick="deleteLocation()">Delete Location</button>
+
+<!-- Borrow Tool form (already hidden at first) -->
+<div id="tb_borrowToolFormWrapper" class="form-container" style="display:none;">
+  <div class="form-group">
+  <label>Tool Name:</label>
+  <select id="tb_borrowToolName">
+    <option value="">- Select Tool -</option>
+  </select>
+</div>
+  <div class="form-group">
+    <label>Serial Number:</label>
+    <input type="text" id="tb_borrowSerial" placeholder="Enter serial number">
+  </div>
+  <div class="form-group">
+    <label>Borrower's Name:</label>
+    <input type="text" id="tb_borrowerName" placeholder="Enter name of borrower">
+  </div>
+  <div class="form-group">
+    <label>Date Borrowed:</label>
+    <input type="date" id="tb_borrowDate">
+  </div>
+  <div class="form-group">
+  <label>Time Borrowed:</label>
+  <input type="time" id="tb_borrowTime">
+</div>
+  <div class="button-wrapper">
+    <button onclick="saveBorrowRecord()">Submit</button>
+    <button onclick="hideBorrowToolForm()">Hide Form</button>
+  </div>
+</div>
+
+<!-- Date Filter in its own wrapper below dropdown -->
+<div id="tbBorrow_dateFilterWrapper" style="display:none; text-align:center; margin-top:15px; padding:10px; border:1px solid #ccc; border-radius:6px; background:#f9f9f9; max-width:200px; margin-left:auto; margin-right:auto;">
+  <label style="margin-right:5px; color:#2c3e50">
+    From: <input type="date" id="tbBorrow_filterStartDate" style="padding:5px; border-radius:4px;">
+  </label>
+  <label style="margin-right:5px; color:#2c3e50">
+    To: <input type="date" id="tbBorrow_filterEndDate" style="padding:5px; border-radius:4px;">
+  </label>
+  <button onclick="filterByDateRange()" style="padding:5px 12px; margin-right:5px; cursor:pointer; border-radius:4px; background:#2c3e50; color:white; border:none;">Filter</button>
+  <button onclick="clearDateFilter()" style="padding:5px 12px; cursor:pointer; border-radius:4px; background:#e74c3c; color:white; border:none;">Clear</button>
+</div>
+
+
+<!-- Borrow Records Table (hidden at first) -->
+<div id="borrowTableWrapper" class="table-container" style="display:none;">
+  <h2>Borrowed Tools</h2>
+  <table id="borrowTable">
+    <thead>
+      <tr>
+        <th>Location</th>
+        <th>Tool Name</th>
+        <th>Serial Number</th>
+        <th>Borrower's Name</th>
+        <th>Date Borrowed</th>
+        <th>Time Borrowed</th> 
+        <th>Date Returned</th>
+        <th>Time Returned</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Records will be added here -->
+    </tbody>
+  </table>
+</div>
+
+<div style="text-align:center; margin-top:15px;">
+  <button id="downloadTableBtn" 
+          class="toggle-form-btn" 
+          style="display:none; background:#27ae60; color:white; max-width:200px; width:auto; margin:0 auto;" 
+          onclick="downloadBorrowTable()">Download LOG</button>
+</div>
+
+</main>
+
+<script>
+let borrowRecordToDeleteIndex = null;
+
+function formatTime12hr(timeStr) {
+  if (!timeStr) return "-";
+  let [hour, minute] = timeStr.split(":");
+  hour = parseInt(hour, 10);
+
+  const ampm = hour >= 12 ? "PM" : "AM";
+  hour = hour % 12 || 12; // convert 0 -> 12
+  return `${hour}:${minute} ${ampm}`;
+}
+
+function formatDatePretty(dateStr) {
+  if (!dateStr) return "-";
+  const date = new Date(dateStr);
+  const options = { month: "short", day: "numeric", year: "numeric" };
+  return date.toLocaleDateString("en-US", options);
+}
+
+function loadToolsDropdown() {
+  const dropdown = document.getElementById("tb_borrowToolName");
+  if (!dropdown) return;
+
+  dropdown.innerHTML = '<option value="">- Select Tool -</option>'; // reset
+
+  let tools = JSON.parse(localStorage.getItem("tb_tools")) || [];
+  let borrowRecords = JSON.parse(localStorage.getItem("tb_BorrowRecords")) || [];
+
+  // Get names of currently borrowed tools (not returned yet)
+  const borrowedTools = borrowRecords
+    .filter(rec => rec.status === "Borrowed")
+    .map(rec => rec.toolName);
+
+  // Only add tools that are NOT currently borrowed
+  tools.forEach(t => {
+    if (!borrowedTools.includes(t.tool)) {
+      const opt = document.createElement("option");
+      opt.value = t.tool;
+      opt.textContent = t.tool;
+      dropdown.appendChild(opt);
+    }
+  });
+}
+  
+  // ---------------- Site functions ----------------
+function postSite() {
+  const site = document.getElementById("tb_siteLocation").value.trim();
+  if (!site) return alert("Please enter a Location / Site before submitting.");
+
+  let STCard = JSON.parse(localStorage.getItem("tb_STCard")) || [];
+  if (STCard.some(s => s.site.toLowerCase() === site.toLowerCase())) {
+    return alert("Site already exists.");
+  }
+
+  STCard.push({ site });
+  localStorage.setItem("tb_STCard", JSON.stringify(STCard));
+  alert("Location saved: " + site);
+
+  document.getElementById("tb_siteLocation").value = "";
+  hideSiteForm();
+
+  // ✅ Refresh dropdown immediately
+  loadLocations();
+}
+
+function loadLocations() {
+  const dropdown = document.getElementById("locDropdown");
+  dropdown.innerHTML = '<option value="">- Select Location -</option>'; // reset first
+
+  let STCard = JSON.parse(localStorage.getItem("tb_STCard")) || [];
+  STCard.forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s.site;
+    opt.textContent = s.site;
+    dropdown.appendChild(opt);
+  });
+}
+
+window.onload = function() {
+  loadLocations();
+};
+
+
+function hideSiteForm(){ document.getElementById("tb_addsiteFormWrapper").style.display = "none"; }
+function showSiteForm(){ document.getElementById("tb_addsiteFormWrapper").style.display = "block"; }
+
+// Show dropdown when "Borrow Tool" button is clicked
+function showBorrowToolForm() {
+  document.getElementById("locDropdownWrapper").style.display = "block";
+  document.getElementById("tb_borrowToolFormWrapper").style.display = "none";
+  document.getElementById("borrowTableWrapper").style.display = "none";
+  loadLocations(); // refresh dropdown with sites
+}
+
+// Called when user selects a site
+function onLocationSelected() {
+  const selectedLoc = document.getElementById("locDropdown").value;
+  const deleteBtn = document.getElementById("deleteLocationBtn");
+  const downloadBtn = document.getElementById("downloadTableBtn"); 
+  const dateFilterWrapper = document.getElementById("tbBorrow_dateFilterWrapper");
+
+  if (selectedLoc) {
+    document.getElementById("tb_borrowToolFormWrapper").style.display = "block";
+    document.getElementById("borrowTableWrapper").style.display = "block";
+
+    loadToolsDropdown();   // ✅ Load tools into dropdown
+    loadBorrowTable();     // refresh with filtered data
+
+    deleteBtn.style.display = "block"; // show delete button
+    downloadBtn.style.display = "block";
+    dateFilterWrapper.style.display = "block"; // show the date filter
+  } else {
+    document.getElementById("tb_borrowToolFormWrapper").style.display = "none";
+    document.getElementById("borrowTableWrapper").style.display = "none";
+
+    deleteBtn.style.display = "none"; // hide button
+    downloadBtn.style.display = "none";  // hide download button 
+    dateFilterWrapper.style.display = "none";
+  }
+}
+
+// ---------------- Tool functions ----------------
+function postTool() {
+  const tool = document.getElementById("tb_toolName").value.trim();
+  if (!tool) return alert("Please enter a Tool Name before submitting.");
+
+  let tools = JSON.parse(localStorage.getItem("tb_tools")) || [];
+  if (tools.some(t => t.tool.toLowerCase() === tool.toLowerCase())) {
+    return alert("Tool already exists.");
+  }
+  tools.push({ tool });
+  localStorage.setItem("tb_tools", JSON.stringify(tools));
+  alert("Tool saved: " + tool);
+  document.getElementById("tb_toolName").value = "";
+  hideToolForm();
+}
+
+function hideToolForm(){ document.getElementById("tb_addToolFormWrapper").style.display = "none"; }
+function showToolForm(){ document.getElementById("tb_addToolFormWrapper").style.display = "block"; }
+
+function hideBorrowToolForm(){ document.getElementById("tb_borrowToolFormWrapper").style.display = "none"; }
+
+function viewAvailableTools() {
+  const wrapper = document.getElementById("availableToolsWrapper");
+  const list = document.getElementById("availableToolsList");
+  list.innerHTML = "";
+
+  let tools = JSON.parse(localStorage.getItem("tb_tools")) || [];
+  let borrowRecords = JSON.parse(localStorage.getItem("tb_BorrowRecords")) || [];
+
+  if (tools.length === 0) {
+    list.innerHTML = "<li style='color:#e74c3c; text-align:center; display:block;'>No tools available. Add some first.</li>";
+  } else {
+    tools.forEach((t, index) => {
+      const li = document.createElement("li");
+
+      // Find if tool is currently borrowed
+      const borrowedRecord = borrowRecords.find(r => r.toolName === t.tool && r.status === "Borrowed");
+
+      // tool name + status
+      const span = document.createElement("span");
+      if (borrowedRecord) {
+        // Format date and time
+        const dateBorrowed = formatDatePretty(borrowedRecord.dateBorrowed);
+        const timeBorrowed = formatTime12hr(borrowedRecord.timeBorrowed);
+
+        span.textContent = `${t.tool} — Borrowed by ${borrowedRecord.borrower} on ${dateBorrowed} at ${timeBorrowed}`;
+        span.style.color = "#e67e22"; // orange for borrowed
+      } else {
+        span.textContent = `${t.tool} — Available`;
+        span.style.color = "#27ae60"; // green for available
+      }
+
+      // delete button
+      const delBtn = document.createElement("button");
+      delBtn.textContent = "Delete";
+      delBtn.className = "delete-tool-btn";
+      delBtn.onclick = function() {
+        deleteTool(index);
+      };
+
+      li.appendChild(span);
+      li.appendChild(delBtn);
+      list.appendChild(li);
+    });
+  }
+
+  wrapper.style.display = "block";
+}
+
+
+function deleteLocation() {
+  const dropdown = document.getElementById("locDropdown");
+  const selectedLoc = dropdown.value;
+
+  if (!selectedLoc) return;
+
+  if (!confirm(`Are you sure you want to delete the location "${selectedLoc}"?\nThis will also delete all borrow records under this location.`)) {
+    return;
+  }
+
+  // 1️⃣ Remove location from storage
+  let STCard = JSON.parse(localStorage.getItem("tb_STCard")) || [];
+  STCard = STCard.filter(s => s.site !== selectedLoc);
+  localStorage.setItem("tb_STCard", JSON.stringify(STCard));
+
+  // 2️⃣ Remove borrow records under this location
+  let borrowRecords = JSON.parse(localStorage.getItem("tb_BorrowRecords")) || [];
+  borrowRecords = borrowRecords.filter(r => r.site !== selectedLoc);
+  localStorage.setItem("tb_BorrowRecords", JSON.stringify(borrowRecords));
+
+  alert(`Location "${selectedLoc}" deleted.`);
+
+  // 3️⃣ Refresh dropdown and table
+  loadLocations();
+  onLocationSelected(); // will hide borrow form if nothing selected
+}
+
+
+
+
+
+// function to delete a tool
+let toolToDeleteIndex = null; // store index temporarily
+
+
+function deleteTool(index) {
+  toolToDeleteIndex = index; // save which tool
+  document.getElementById("deleteModal").style.display = "flex";
+}
+
+function closeDeleteModal() {
+  document.getElementById("deleteModal").style.display = "none";
+  toolToDeleteIndex = null;
+}
+
+function confirmDelete() {
+  if (toolToDeleteIndex !== null) {
+    let tools = JSON.parse(localStorage.getItem("tb_tools")) || [];
+    tools.splice(toolToDeleteIndex, 1);
+    localStorage.setItem("tb_tools", JSON.stringify(tools));
+
+    // Refresh the Available Tools list
+    viewAvailableTools();
+
+    // Refresh the Borrow Tool dropdown immediately
+    loadToolsDropdown();
+  }
+  closeDeleteModal();
+}
+
+
+
+function hideAvailableTools() {
+  document.getElementById("availableToolsWrapper").style.display = "none";
+}
+
+// ---------------- Borrow Tool Form Submit ----------------
+function saveBorrowRecord() {
+  const site = document.getElementById("locDropdown").value;
+  const toolName = document.getElementById("tb_borrowToolName").value;
+  const serial = document.getElementById("tb_borrowSerial").value.trim();
+  const borrower = document.getElementById("tb_borrowerName").value.trim();
+  const dateBorrowed = document.getElementById("tb_borrowDate").value;
+  const timeBorrowed = document.getElementById("tb_borrowTime").value;
+  const dateReturned = "";
+
+  if (!site || !toolName || !serial || !borrower || !dateBorrowed || !timeBorrowed) {
+    return alert("Please fill in all required fields.");
+  }
+
+  let borrowRecords = JSON.parse(localStorage.getItem("tb_BorrowRecords")) || [];
+
+  const record = {
+    site,
+    toolName,
+    serial,
+    borrower,
+    dateBorrowed,
+    timeBorrowed,
+    dateReturned,
+    status: "Borrowed"
+  };
+
+  borrowRecords.push(record);
+  localStorage.setItem("tb_BorrowRecords", JSON.stringify(borrowRecords));
+
+  // ✅ Refresh table immediately
+  loadBorrowTable();
+
+  // ✅ Refresh dropdown immediately so borrowed tool disappears
+  loadToolsDropdown();
+  viewAvailableTools();
+
+  // Reset form fields
+  document.getElementById("tb_borrowToolName").value = "";
+  document.getElementById("tb_borrowSerial").value = "";
+  document.getElementById("tb_borrowerName").value = "";
+  document.getElementById("tb_borrowDate").value = "";
+  document.getElementById("tb_borrowTime").value = "";
+}
+
+
+
+
+// ---------------- Load Borrow Table ----------------
+function loadBorrowTable() {
+  let borrowRecords = JSON.parse(localStorage.getItem("tb_BorrowRecords")) || [];
+  const tbody = document.querySelector("#borrowTable tbody");
+  tbody.innerHTML = "";
+
+  const selectedLoc = document.getElementById("locDropdown").value;
+
+  // Filter by selected location
+  let filteredRecords = borrowRecords.filter(rec => rec.site === selectedLoc);
+
+  // ✅ Sort by Date Borrowed ascending (oldest first)
+  filteredRecords.sort((a, b) => new Date(a.dateBorrowed) - new Date(b.dateBorrowed));
+
+  filteredRecords.forEach((rec) => {
+    const recordIndex = borrowRecords.findIndex(r => 
+      r.site === rec.site &&
+      r.toolName === rec.toolName &&
+      r.serial === rec.serial &&
+      r.borrower === rec.borrower &&
+      r.dateBorrowed === rec.dateBorrowed &&
+      r.timeBorrowed === rec.timeBorrowed &&
+      r.status === rec.status
+    );
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${rec.site}</td>
+      <td>${rec.toolName}</td>
+      <td>${rec.serial}</td>
+      <td>${rec.borrower}</td>
+      <td>${formatDatePretty(rec.dateBorrowed)}</td>
+      <td>${formatTime12hr(rec.timeBorrowed)}</td>
+      <td>${rec.dateReturned ? formatDatePretty(rec.dateReturned) : "-"}</td>
+      <td>${rec.timeReturned ? formatTime12hr(rec.timeReturned) : "-"}</td>
+      <td>${rec.status}</td>
+      <td>
+        <button onclick="returnTool(${recordIndex})">Return</button>
+        <button onclick="deleteRecord(${recordIndex})">Delete</button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+
+
+// ---------------- Action Buttons ----------------
+
+function deleteRecord(index) {
+  borrowRecordToDeleteIndex = index;
+  document.getElementById("deleteBorrowModal").style.display = "flex";
+}
+
+function closeDeleteBorrowModal() {
+  document.getElementById("deleteBorrowModal").style.display = "none";
+  borrowRecordToDeleteIndex = null;
+}
+
+function confirmDeleteBorrow() {
+  if (borrowRecordToDeleteIndex !== null) {
+    let borrowRecords = JSON.parse(localStorage.getItem("tb_BorrowRecords")) || [];
+    borrowRecords.splice(borrowRecordToDeleteIndex, 1);
+    localStorage.setItem("tb_BorrowRecords", JSON.stringify(borrowRecords));
+    loadBorrowTable(); // refresh table
+  }
+  closeDeleteBorrowModal();
+}
+
+
+// ---------------- Init on Page Load ----------------
+window.onload = function() {
+  loadLocations();
+  loadBorrowTable();
+};
+
+let returnRecordIndex = null; // store which record is being returned
+
+function returnTool(index) {
+  returnRecordIndex = index;
+  document.getElementById("returnModal").style.display = "flex";
+}
+
+function closeReturnModal() {
+  document.getElementById("returnModal").style.display = "none";
+  returnRecordIndex = null;
+}
+
+function confirmReturn() {
+  const returnDate = document.getElementById("returnDateInput").value;
+  const returnTime = document.getElementById("returnTimeInput").value;
+
+  if (!returnDate || !returnTime) {
+    return alert("Please select both Date and Time.");
+  }
+
+  let borrowRecords = JSON.parse(localStorage.getItem("tb_BorrowRecords")) || [];
+  if (returnRecordIndex !== null) {
+    // Update the record
+    borrowRecords[returnRecordIndex].dateReturned = returnDate;
+    borrowRecords[returnRecordIndex].timeReturned = returnTime;
+    borrowRecords[returnRecordIndex].status = "Returned";
+
+    // Save updated records
+    localStorage.setItem("tb_BorrowRecords", JSON.stringify(borrowRecords));
+
+    // Refresh the table for the selected location
+    loadBorrowTable();
+
+    // Refresh the tool dropdown so returned tool becomes available again
+    loadToolsDropdown();
+    viewAvailableTools();
+  }
+
+  closeReturnModal();
+}
+
+function filterByDateRange() {
+  const startDate = document.getElementById("tbBorrow_filterStartDate").value;
+  const endDate = document.getElementById("tbBorrow_filterEndDate").value;
+  const selectedLoc = document.getElementById("locDropdown").value;
+
+  if (!selectedLoc) return alert("Please select a location first.");
+
+  let borrowRecords = JSON.parse(localStorage.getItem("tb_BorrowRecords")) || [];
+
+  // Filter by location
+  let filteredRecords = borrowRecords.filter(r => r.site === selectedLoc);
+
+  // Filter by date borrowed
+  if (startDate) filteredRecords = filteredRecords.filter(r => r.dateBorrowed >= startDate);
+  if (endDate) filteredRecords = filteredRecords.filter(r => r.dateBorrowed <= endDate);
+
+  // ✅ Sort by Date Borrowed ascending (oldest first)
+  filteredRecords.sort((a, b) => new Date(a.dateBorrowed) - new Date(b.dateBorrowed));
+
+  // Populate table
+  const tbody = document.querySelector("#borrowTable tbody");
+  tbody.innerHTML = "";
+
+  filteredRecords.forEach((rec) => {
+    const recordIndex = borrowRecords.findIndex(r => 
+      r.site === rec.site &&
+      r.toolName === rec.toolName &&
+      r.serial === rec.serial &&
+      r.borrower === rec.borrower &&
+      r.dateBorrowed === rec.dateBorrowed &&
+      r.timeBorrowed === rec.timeBorrowed &&
+      r.status === rec.status
+    );
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${rec.site}</td>
+      <td>${rec.toolName}</td>
+      <td>${rec.serial}</td>
+      <td>${rec.borrower}</td>
+      <td>${formatDatePretty(rec.dateBorrowed)}</td>
+      <td>${formatTime12hr(rec.timeBorrowed)}</td>
+      <td>${rec.dateReturned ? formatDatePretty(rec.dateReturned) : "-"}</td>
+      <td>${rec.timeReturned ? formatTime12hr(rec.timeReturned) : "-"}</td>
+      <td>${rec.status}</td>
+      <td>
+        <button onclick="returnTool(${recordIndex})">Return</button>
+        <button onclick="deleteRecord(${recordIndex})">Delete</button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+
+
+function clearDateFilter() {
+  document.getElementById("tbBorrow_filterStartDate").value = "";
+  document.getElementById("tbBorrow_filterEndDate").value = "";
+  loadBorrowTable(); // reload table for selected location
+}
+
+
+function downloadBorrowTable() {
+  const tbody = document.querySelector("#borrowTable tbody");
+  if (!tbody || tbody.rows.length === 0) return alert("No records to download.");
+
+  // Grab currently visible rows in the table
+  const wsData = [
+    [], [], [], [], 
+    ["TOOLS BORROWER LOG"], [], [], [],
+    ["Location", document.getElementById("locDropdown").value],
+    [],
+    ["Tool Name", "Serial No.", "Borrower's Name", "Date Borrowed", "Date Returned"]
+  ];
+
+  for (let row of tbody.rows) {
+    const cells = row.cells;
+    wsData.push([
+      cells[1].innerText, // Tool Name
+      cells[2].innerText, // Serial No.
+      cells[3].innerText, // Borrower's Name
+      cells[4].innerText, // Date Borrowed
+      cells[6].innerText  // Date Returned
+    ]);
+  }
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+  // Merge the header cells
+  ws['!merges'] = [
+    { s: { r: 4, c: 0 }, e: { r: 6, c: 4 } } // Merge "TOOLS BORROWER LOG"
+  ];
+
+  // Style title
+  ws['A5'].s = {
+    font: { sz: 20, bold: true },
+    alignment: { horizontal: "center", vertical: "center" }
+  };
+
+  ws['!cols'] = [
+    { wch: 20 }, { wch: 12 }, { wch: 16 }, { wch: 16 }, { wch: 16 }
+  ];
+
+  XLSX.utils.book_append_sheet(wb, ws, "Borrowed Tools");
+  XLSX.writeFile(wb, `${document.getElementById("locDropdown").value}_ToolBorrowersLog.xlsx`);
+}
+
+
+
+
+
+
+
+
+
+
+</script>
+
+
+<!-- Return Confirmation Modal -->
+<div id="returnModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeReturnModal()">&times;</span>
+    <h2>Return Tool</h2>
+
+    <div class="form-group">
+  <label style="color:#2c3e50; font-weight:bold;">Date Returned:</label>
+  <input type="date" id="returnDateInput" 
+         style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; background:#f9f9ff; color:#2c3e50;">
+</div>
+<div class="form-group">
+  <label style="color:#2c3e50; font-weight:bold;">Time Returned:</label>
+  <input type="time" id="returnTimeInput" 
+         style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; background:#f9f9ff; color:#2c3e50;">
+</div>
+
+    <div style="text-align:center; margin-top:15px;">
+      <button class="confirm-btn" onclick="confirmReturn()">Confirm</button>
+      <button class="cancel-btn" onclick="closeReturnModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Delete Borrow Record Modal -->
+<div id="deleteBorrowModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeDeleteBorrowModal()">&times;</span>
+    <h2>Delete Borrow Record</h2>
+    <p>Are you sure you want to delete this borrow record?</p>
+    <div style="text-align:center; margin-top:15px;">
+      <button class="confirm-btn" onclick="confirmDeleteBorrow()">Yes, Delete</button>
+      <button class="cancel-btn" onclick="closeDeleteBorrowModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeDeleteModal()">&times;</span>
+    <h2>Delete Tool</h2>
+    <p>Are you sure you want to delete this tool?</p>
+    <div style="text-align:center; margin-top:15px;">
+      <button class="confirm-btn" onclick="confirmDelete()">Yes, Delete</button>
+      <button class="cancel-btn" onclick="closeDeleteModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>&copy; Kurth Clarenze Lacsinto Novesteras. All rights reserved.</p>
+</footer>
+</body>
+</html>
