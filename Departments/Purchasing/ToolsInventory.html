@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tools Inventory</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  body > header,
+  body > h1,
+  body > .top-button-wrapper,
+  body > #tblog_addsiteFormWrapper,
+  body > #tblog_addToolFormWrapper,
+  body > #tblog_borrowToolFormWrapper,
+  body > #tblog_availableToolsWrapper,
+  body > #tblog_locDropdownWrapper,
+  body > #tblog_deleteLocationBtn {
+    flex-shrink: 0;
+  }
+
+  nav { background-color: #2c3e50; padding: 15px 25px; color: white; }
+  .nav-container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+  .logo { font-size: 20px; font-weight: 700; color: white; }
+  .nav-links { display: flex; flex-wrap: wrap; gap: 15px; }
+  .nav-item { color: white; text-decoration: none; font-size: 16px; padding: 10px 15px; background: none; border: none; border-radius: 6px; cursor: pointer; }
+  .nav-item:hover { background-color: white; color: #2c3e50; }
+
+  .back-button { display: block; margin: 10px 20px 0; text-align: left; background-color: #2c3e50; color: white; padding: 10px 25px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; text-decoration: none; width: fit-content; }
+  .back-button:hover { background-color: #34495e; }
+
+  h1 { text-align: center; color: #2c3e50; font-size: 24px; margin-top: 20px; }
+
+  .form-container {
+    background: #2c3e50;
+    color: white;
+    width: 45%;
+    max-width: none;
+    margin: 20px auto;
+    padding: 40px 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  .form-group { margin-bottom: 15px; }
+  label { display: block; font-weight: bold; margin-bottom: 5px; color: #ffffff; }
+  input, select {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: none;
+  }
+
+  .button-wrapper { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+  .button-wrapper button { background-color: #ffffff; color: #2c3e50; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; max-width: 150px; width: 100%; }
+  .button-wrapper button:hover { background-color: #ddd; }
+
+  .top-button-wrapper { display: flex; justify-content: center; margin-top: 20px; gap: 15px; flex-wrap: wrap; }
+  .toggle-form-btn { background-color: #2c3e50; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: 600; min-width:140px; }
+  .toggle-form-btn:hover { background-color: #34495e; }
+
+  #tblog_availableToolsWrapper { background: #ffffff; border-radius: 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.12); max-width: 600px; margin: 25px auto; padding: 25px 20px; display:none; }
+  #tblog_availableToolsWrapper h3 { margin-bottom: 20px; font-size: 22px; font-weight: 700; text-align: center; color: #2c3e50; }
+
+  #tblog_availableToolsList { list-style: none; padding: 0; margin: 0; }
+  #tblog_availableToolsList li { padding: 14px 20px; margin-bottom: 12px; background: #f8f9fa; border-radius: 10px; font-size: 15px; color: #2c3e50; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 3px 8px rgba(0,0,0,0.06); }
+  #tblog_availableToolsList li span.available { color: #27ae60; font-weight: 600; }
+  #tblog_availableToolsList li span.borrowed { color: #e67e22; font-style: italic; }
+
+  .delete-tool-btn { background: #e74c3c; border: none; color: #fff; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; }
+  .delete-tool-btn:hover { background: #c0392b; }
+
+  .loc-select { background: #ffffff; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 600px; margin: 20px auto; padding: 20px; display: flex; flex-direction: column; align-items: center; display:none; }
+  .loc-select label { color: #2c3e50; text-align: center; margin-bottom: 8px; font-weight: bold; }
+  .loc-select select { width: auto; min-width: 200px; padding: 10px 12px; border-radius: 6px; border: 1px solid #ccc; text-align:center; text-align-last:center; }
+
+  #tblog_deleteLocationBtn { background: #e74c3c; color: white; padding: 10px 20px; border-radius: 6px; cursor: pointer; margin: 15px auto; max-width: 200px; text-align: center; }
+
+  main { flex: 1; }
+  .footer { background-color: #2c3e50; color: white; text-align: center; padding: 15px 20px; margin-top: auto; }
+
+  /* Modal Overlay */
+.modal {
+  display: none;  /* stays hidden by default */
+  position: fixed; 
+  z-index: 9999; 
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5); 
+  justify-content: center; 
+  align-items: center;
+}
+
+/* Modal Content */
+.modal-content {
+  background: #fff; 
+  padding: 25px; 
+  border-radius: 10px; 
+  width: 90%; 
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  color: #c0392b;
+}
+
+.modal-buttons {
+  margin-top: 20px; 
+  display: flex; 
+  justify-content: center; 
+  gap: 15px;
+}
+
+.confirm-btn {
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.confirm-btn:hover { background: #c0392b; }
+
+.cancel-btn {
+  background: #7f8c8d;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.cancel-btn:hover { background: #606c76; }
+
+.project-location-container {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin: 20px auto;
+  max-width: 900px;
+}
+
+.pl-col {
+  flex: 1;              /* ✅ both project and location take equal space */
+  min-width: 250px;     /* keeps them wide enough */
+  display: flex;
+  flex-direction: column;
+}
+
+.pl-col label {
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 8px;
+}
+
+.pl-row {
+  display: flex;
+  gap: 10px;
+  align-items: center; /* ✅ keeps select and button aligned vertically */
+}
+
+.pl-row select {
+  flex: 1; /* ✅ lets select take all remaining space */
+  min-width: 200px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* Style project/location delete buttons same as tool delete */
+#tblog_deleteProjectBtn,
+#tblog_deleteLocationBtn {
+  display: flex;           /* always part of flex row */
+  align-items: center;
+  justify-content: center;
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  visibility: hidden;      /* hide without moving layout */
+}
+
+#tblog_deleteProjectBtn.show,
+#tblog_deleteLocationBtn.show {
+  visibility: visible;     /* only show visually */
+}
+
+
+#tblog_deleteProjectBtn:hover,
+#tblog_deleteLocationBtn:hover {
+  background: #c0392b;
+}
+
+#tblog_availableToolsList li {
+  padding: 14px 20px;
+  margin-bottom: 12px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  font-size: 15px;
+  color: #2c3e50;
+  
+  /* Center inline */
+  display: flex;
+  justify-content: center;   /* center horizontally */
+  align-items: center;       /* center vertically */
+  gap: 10px;                 /* space between tool text and button */
+  
+  box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+  text-align: center;
+}
+
+#tblog_availableToolsWrapper h3 {
+  text-align: center;
+}
+
+
+.pl-row button:hover {
+  background: #c0392b;
+}
+
+
+</style>
+</head>
+<body>
+<header>
+<nav>
+  <div class="nav-container">
+    <div class="logo">RD8 BUILDERS CORP</div>
+    <div class="nav-links" id="nav-links">
+      <a href="../../Index.html" class="nav-item">Home</a>
+      <a href="../../AboutUs.html" class="nav-item">About Us</a>
+      <a href="../../CompanyProfile.html" class="nav-item">Company Profile</a>
+      <a href="../../ContactUs.html" class="nav-item">Contact Us</a>
+      <a href="#" class="nav-item" id="authLink">Login</a>
+    </div>
+  </div>
+</nav>
+<a class="back-button" href="Purchasing.html">← Back to Purchasing</a>
+</header>
+
+<h1>Tools Inventory</h1>
+
+<!-- Top Buttons -->
+<div class="top-button-wrapper">
+  <button class="toggle-form-btn" onclick="tblog_showSiteForm()">Add Project</button>
+  <button class="toggle-form-btn" onclick="tblog_showLocationForm()">Add Location</button>
+  <button class="toggle-form-btn" onclick="tblog_showToolForm()">Add Tool</button>
+  <button class="toggle-form-btn" onclick="tblog_showToolInventoryForm()">Tool Inventory</button>
+  <button class="toggle-form-btn" onclick="tblog_viewCurrentTools()">Current Tools</button>
+</div>
+
+
+<!-- Current Tools List -->
+<div id="tblog_availableToolsWrapper">
+  <h3>Current Tools Status</h3>
+
+  <!-- Encoded Tools List with Delete Buttons -->
+  <ul id="tblog_encodedToolsList" style="list-style:none; padding:0; margin-bottom:20px;"></ul>
+
+  <table id="tblog_availableToolsList" style="width:100%; border-collapse: collapse;">
+    <thead>
+      <tr style="background:#2c3e50; color:white;">
+        <th style="padding:8px; border:1px solid #ccc;">Tool Name</th>
+        <th style="padding:8px; border:1px solid #ccc;">Project</th>
+        <th style="padding:8px; border:1px solid #ccc;">Location</th>
+        <th style="padding:8px; border:1px solid #ccc;">Status</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+    <!-- Hide Button Below Table -->
+  <div style="text-align:center; margin-top:15px;">
+    <button id="hideCurrentToolsBtn" style="background:#2c3e50; color:white; padding:8px 16px; border:none; border-radius:6px; cursor:pointer;">
+      Hide Current Tools
+    </button>
+  </div>
+</div>
+</div>
+
+
+<!-- Add Project Form -->
+<div id="tblog_addsiteFormWrapper" class="form-container" style="display:none;">
+  <div class="form-group">
+    <label>Project Name:</label>
+    <input type="text" id="tblog_siteProject" placeholder="Enter Project Name">
+  </div>
+  <div class="button-wrapper">
+    <button onclick="tblog_postSite()">Submit</button>
+    <button onclick="tblog_hideSiteForm()">Hide Form</button>
+  </div>
+</div>
+
+<!-- Add Location Form -->
+<div id="tblog_addLocationFormWrapper" class="form-container" style="display:none;">
+  <div class="form-group">
+    <label>Location:</label>
+    <input type="text" id="tblog_locationName" placeholder="Enter location">
+  </div>
+  <div class="button-wrapper">
+    <button onclick="tblog_postLocation()">Submit</button>
+    <button onclick="tblog_hideLocationForm()">Hide Form</button>
+  </div>
+</div>
+
+<!-- Add Tool Form -->
+<div id="tblog_addToolFormWrapper" class="form-container" style="display:none;">
+  <div class="form-group">
+    <label>Tool Name:</label>
+    <input type="text" id="tblog_toolName" placeholder="Enter tool name">
+  </div>
+  <div class="button-wrapper">
+    <button onclick="tblog_postTool()">Submit</button>
+    <button onclick="tblog_hideToolForm()">Hide Form</button>
+  </div>
+</div>
+
+<!-- Project & Location Wrapper -->
+<div class="project-location-container" style="display:none;">
+  <!-- Project -->
+  <div class="pl-col">
+    <label for="tblog_projectDropdown">Project</label>
+    <div class="pl-row">
+      <select id="tblog_projectDropdown" onchange="tblog_onProjectSelected()">
+        <option value="">- Select Project -</option>
+      </select>
+      <button id="tblog_deleteProjectBtn" onclick="tblog_deleteProject()">Delete</button>
+    </div>
+  </div>
+
+  <!-- Location -->
+<div class="pl-col" id="tblog_locDropdownWrapper" style="display:none;">
+  <label for="tblog_locDropdown">Location</label>
+  <div class="pl-row">
+    <select id="tblog_locDropdown" onchange="tblog_onLocationSelected()">
+      <option value="">- Select Location -</option>
+    </select>
+    <button id="tblog_deleteLocationBtn" onclick="tblog_deleteLocation()">Delete</button>
+  </div>
+</div>
+</div>
+
+
+<!-- Tool Inventory Form -->
+<div id="tblog_toolInventoryFormWrapper" class="form-container" style="display:none;">
+  <div class="form-group">
+    <label>Tool Name:</label>
+    <select id="tblog_toolInventoryName">
+      <option value="">- Select Tool -</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Serial Number:</label>
+    <input type="text" id="tblog_toolSerial" placeholder="Enter serial number">
+  </div>
+  <div class="form-group">
+    <label>Status:</label>
+    <select id="tblog_toolStatus">
+      <option value="">- Select Status -</option>
+      <option value="Good Condition">Good Condition</option>
+      <option value="For Maintenance">For Maintenance</option>
+      <option value="For Repair">For Repair</option>
+    </select>
+  </div>
+  <div class="button-wrapper">
+    <button onclick="tblog_saveToolInventory()">Submit</button>
+    <button onclick="tblog_hideToolInventoryForm()">Hide Form</button>
+  </div>
+</div>
+
+<!-- Tool Inventory Records Table -->
+<div id="tblog_toolInventoryTableWrapper" style="max-width:900px;margin:20px auto; display:none;">
+  <h3 style="text-align:center;color:#2c3e50;">Tool Inventory Records</h3>
+  <table id="tblog_toolInventoryTable" style="width:100%;border-collapse:collapse;">
+    <thead>
+      <tr style="background:#2c3e50;color:white;">
+        <th style="padding:10px;border:1px solid #ccc;">Project</th>
+        <th style="padding:10px;border:1px solid #ccc;">Location</th>
+        <th style="padding:10px;border:1px solid #ccc;">Tool Name</th>
+        <th style="padding:10px;border:1px solid #ccc;">Serial No.</th>
+        <th style="padding:10px;border:1px solid #ccc;">Status</th>
+        <th style="padding:10px;border:1px solid #ccc;">Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<!--Download Excel-->
+<div id="downloadExcelWrapper" style="text-align:center; margin-top:15px; display:none;">
+  <button onclick="downloadToolsExcel()" 
+          style="background-color:#2c3e50; color:white; padding:10px 20px; border:none; border-radius:6px; cursor:pointer;">
+    Download Excel
+  </button>
+</div>
+
+
+
+<script>
+ // LocalStorage keys
+const LS_PROJECTS = "tb_projects";
+const LS_LOCATIONS = "tb_locations";
+const LS_TOOLS = "tb_tools";
+const LS_BORROW = "tb_borrowRecords";
+
+let tblog_projects = JSON.parse(localStorage.getItem(LS_PROJECTS)) || [];
+let tblog_locations = JSON.parse(localStorage.getItem(LS_LOCATIONS)) || [];
+let tblog_tools = JSON.parse(localStorage.getItem(LS_TOOLS)) || [];
+let tblog_borrowRecords = JSON.parse(localStorage.getItem(LS_BORROW)) || [];
+
+function saveProjects() {
+  localStorage.setItem(LS_PROJECTS, JSON.stringify(tblog_projects));
+}
+function saveLocations() {
+  localStorage.setItem(LS_LOCATIONS, JSON.stringify(tblog_locations));
+}
+function saveTools() {
+  localStorage.setItem(LS_TOOLS, JSON.stringify(tblog_tools));
+}
+function saveBorrowRecords() {
+  localStorage.setItem(LS_BORROW, JSON.stringify(tblog_borrowRecords));
+}
+
+
+  // Show / Hide Forms
+  function tblog_showSiteForm() { document.getElementById("tblog_addsiteFormWrapper").style.display = "block"; }
+  function tblog_hideSiteForm() { document.getElementById("tblog_addsiteFormWrapper").style.display = "none"; }
+
+// Show / Hide Location Form
+function tblog_showLocationForm() {
+  document.getElementById("tblog_addLocationFormWrapper").style.display = "block";
+}
+function tblog_hideLocationForm() {
+  document.getElementById("tblog_addLocationFormWrapper").style.display = "none";
+}
+
+
+// Show / Hide Tool Form
+function tblog_showToolForm() {
+  document.getElementById("tblog_addToolFormWrapper").style.display = "block";
+}
+function tblog_hideToolForm() {
+  document.getElementById("tblog_addToolFormWrapper").style.display = "none";
+}
+
+// Show / Hide Tool Inventory Form
+function tblog_showToolInventoryForm() {
+  document.querySelector(".project-location-container").style.display = "flex";
+  tblog_updateProjectDropdown();
+
+  // 🔓 Enable status dropdown for new entries
+  document.getElementById("tblog_toolStatus").disabled = false;
+}
+
+
+
+function tblog_hideToolInventoryForm() {
+  document.getElementById("tblog_toolInventoryFormWrapper").style.display = "none";
+  document.querySelector(".project-location-container").style.display = "none";
+}
+
+  // Current Tools
+  function tblog_viewCurrentTools() {
+  const wrapper = document.getElementById("tblog_availableToolsWrapper");
+  wrapper.style.display = wrapper.style.display === "block" ? "none" : "block";
+  
+  tblog_renderAvailableTools();  // existing inventory table
+  tblog_renderEncodedTools();    // 🔹 render encoded tools list
+}
+
+// Hide Current Tools container
+document.getElementById("hideCurrentToolsBtn").onclick = function() {
+  const wrapper = document.getElementById("tblog_availableToolsWrapper");
+  wrapper.style.display = "none";
+};
+
+// Add Project
+function tblog_postSite() {
+  const project = document.getElementById("tblog_siteProject").value.trim();
+  if (!project) return alert("Please enter a Project ID");
+  tblog_projects.push(project);
+  saveProjects(); 
+  document.getElementById("tblog_siteProject").value = ""; // clear input
+  tblog_hideSiteForm();
+  alert("Project added!");
+  location.reload();
+}
+
+
+
+  function tblog_updateLocationDropdown() {
+  const dropdown = document.getElementById("tblog_locDropdown");
+  dropdown.innerHTML = '<option value="">- Select Location -</option>';
+  
+  tblog_locations.forEach(loc => {
+    const opt = document.createElement("option");
+    opt.value = loc;
+    opt.textContent = loc;
+    dropdown.appendChild(opt);
+  });
+
+  // Show/hide the actual dropdown correctly
+  dropdown.style.display = tblog_locations.length ? "block" : "none";
+}
+
+  function tblog_updateProjectDropdown() {
+  const dropdown = document.getElementById("tblog_projectDropdown");
+  dropdown.innerHTML = '<option value="">- Select Project -</option>';
+  tblog_projects.forEach(proj => {
+    const opt = document.createElement("option");
+    opt.value = proj;
+    opt.textContent = proj;
+    dropdown.appendChild(opt);
+  });
+}
+
+function tblog_onProjectSelected() {
+  const selectedProject = document.getElementById("tblog_projectDropdown").value;
+  const projDeleteBtn = document.getElementById("tblog_deleteProjectBtn");
+  const locWrapper = document.getElementById("tblog_locDropdownWrapper");
+  const locDeleteBtn = document.getElementById("tblog_deleteLocationBtn");
+
+  const inventoryForm = document.getElementById("tblog_toolInventoryFormWrapper");
+  const tableWrapper = document.getElementById("tblog_toolInventoryTableWrapper");
+
+  if (selectedProject) {
+    projDeleteBtn.classList.add("show"); // show project delete
+    tblog_updateLocationDropdown();
+
+    if (tblog_locations.length > 0) {
+      locWrapper.style.display = "block";
+      locDeleteBtn.classList.add("show");
+    } else {
+      locWrapper.style.display = "none";
+      locDeleteBtn.classList.remove("show");
+    }
+  } else {
+    locWrapper.style.display = "none";
+    projDeleteBtn.classList.remove("show");
+    locDeleteBtn.classList.remove("show");
+    inventoryForm.style.display = "none";
+    tableWrapper.style.display = "none";
+  }
+
+  updateDownloadButtonVisibility(); // 🔹 update button visibility
+}
+
+
+
+
+function tblog_onLocationSelected() {
+  const selectedProject = document.getElementById("tblog_projectDropdown").value;
+  const selectedLoc = document.getElementById("tblog_locDropdown").value;
+
+  const tableWrapper = document.getElementById("tblog_toolInventoryTableWrapper");
+  const inventoryForm = document.getElementById("tblog_toolInventoryFormWrapper");
+
+  if (selectedProject && selectedLoc) {
+    // Show Tool Inventory form
+    inventoryForm.style.display = "block";
+
+    // Update tool dropdown
+    tblog_updateToolInventoryDropdown();
+
+    // Show inventory table filtered by project + location
+    tblog_renderInventoryTable(selectedProject, selectedLoc);
+    tableWrapper.style.display = "block";
+  } else {
+    // Hide table and form if either is not selected
+    inventoryForm.style.display = "none";
+    tableWrapper.style.display = "none";
+  }
+  updateDownloadButtonVisibility(); // 🔹 update button visibility
+}
+
+
+
+
+
+// Open modal
+function openDeleteModal(type, name) {
+  deleteType = type;
+  document.getElementById("deleteModalTitle").textContent = "Confirm Deletion";
+  document.getElementById("deleteModalMessage").textContent = 
+    `Are you sure you want to delete the ${type}: "${name}"?`;
+  document.getElementById("deleteModal").style.display = "flex";
+
+  // Set confirm button action
+  document.getElementById("confirmDeleteBtn").onclick = function() {
+    if (deleteType === "project") {
+      actuallyDeleteProject(name);
+    } else if (deleteType === "location") {
+      actuallyDeleteLocation(name);
+    }
+    closeDeleteModal();
+  };
+}
+
+// Close modal
+function closeDeleteModal() {
+  document.getElementById("deleteModal").style.display = "none";
+}
+
+// Delete Project
+function tblog_deleteProject() {
+  const selected = document.getElementById("tblog_projectDropdown").value;
+  if (!selected) return alert("Please select a project to delete.");
+  openDeleteModal("project", selected);
+}
+
+function actuallyDeleteProject(name) {
+  // Remove the project from the array
+  tblog_projects = tblog_projects.filter(proj => proj !== name);
+  saveProjects();
+
+  // Update the dropdown
+  tblog_updateProjectDropdown();
+
+  // Hide delete button and related elements
+  document.getElementById("tblog_deleteProjectBtn").classList.remove("show");
+  document.getElementById("tblog_locDropdownWrapper").style.display = "none";
+  document.getElementById("tblog_deleteLocationBtn").classList.remove("show");
+  document.getElementById("tblog_toolInventoryFormWrapper").style.display = "none";
+  document.getElementById("tblog_toolInventoryTableWrapper").style.display = "none";
+
+  alert("Project deleted!");
+}
+
+
+function actuallyDeleteLocation(name) {
+  tblog_locations = tblog_locations.filter(loc => loc !== name);
+  saveLocations();
+  tblog_updateLocationDropdown();
+
+  const locWrapper = document.getElementById("tblog_locDropdownWrapper");
+  const locDeleteBtn = document.getElementById("tblog_deleteLocationBtn");
+
+  if (tblog_locations.length === 0) {
+    locWrapper.style.display = "none";
+    locDeleteBtn.classList.remove("show");
+    document.getElementById("tblog_toolInventoryFormWrapper").style.display = "none";
+  }
+
+  alert("Location deleted!");
+}
+
+// Delete Location
+function tblog_deleteLocation() {
+  const selected = document.getElementById("tblog_locDropdown").value;
+  if (!selected) return alert("Please select a location to delete.");
+  openDeleteModal("location", selected);
+}
+
+  // Add Location
+function tblog_postLocation() {
+  const loc = document.getElementById("tblog_locationName").value.trim();
+  if (!loc) return alert("Please enter a location name");
+  tblog_locations.push(loc);
+  saveLocations();
+  document.getElementById("tblog_locationName").value = "";
+  tblog_hideLocationForm();
+  alert("Location added!");
+  tblog_updateLocationDropdown(); // ✅ refresh dropdown immediately
+}
+
+
+  function tblog_renderAvailableTools() {
+  const table = document.getElementById("tblog_availableToolsList").querySelector("tbody");
+  table.innerHTML = "";
+
+  if(tblog_inventoryRecords.length === 0) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td colspan="4" style="text-align:center; padding:10px;">No tools in Inventory.</td>`;
+    table.appendChild(tr);
+    return;
+  }
+
+  tblog_inventoryRecords.forEach((rec, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td style="padding:8px; border:1px solid #ccc;">${rec.toolName}</td>
+      <td style="padding:8px; border:1px solid #ccc;">${rec.project}</td>
+      <td style="padding:8px; border:1px solid #ccc;">${rec.location}</td>
+      <td style="padding:8px; border:1px solid #ccc;">${rec.status}</td>
+    `;
+    table.appendChild(tr);
+  });
+}
+
+
+
+window.addEventListener("load", () => {
+  tblog_updateProjectDropdown();
+  tblog_updateLocationDropdown();
+  tblog_renderAvailableTools(); // <-- render current tools list
+});
+
+
+
+
+  // Delete Tool
+  function tblog_deleteTool(index) {
+  if (!confirm("Are you sure you want to delete this tool?")) return;
+  tblog_tools.splice(index, 1);
+  saveTools(); // ✅ save changes to localStorage
+  tblog_renderAvailableTools();
+  tblog_updateToolInventoryDropdown(); // ✅ keep dropdown in sync
+}
+
+  // Add Tool
+function tblog_postTool() {
+  const toolName = document.getElementById("tblog_toolName").value.trim();
+  if (!toolName) return alert("Please enter a tool name");
+
+  // Add to tools list (for dropdowns)
+  tblog_tools.push({ name: toolName });
+  saveTools();
+
+  document.getElementById("tblog_toolName").value = "";
+  tblog_hideToolForm();
+  alert("Tool added!");
+  tblog_updateToolInventoryDropdown();
+}
+
+
+
+// Inventory Records Array
+let tblog_inventoryRecords = JSON.parse(localStorage.getItem("tb_inventoryRecords")) || [];
+
+// Save Inventory Record
+function tblog_saveToolInventory() {
+  const project = document.getElementById("tblog_projectDropdown").value;
+  const location = document.getElementById("tblog_locDropdown").value;
+  const toolName = document.getElementById("tblog_toolInventoryName").value;
+  const serial = document.getElementById("tblog_toolSerial").value.trim();
+  const status = document.getElementById("tblog_toolStatus").value;
+
+  if (!project || !location || !toolName || !serial || !status) {
+    return alert("Please complete all fields.");
+  }
+
+  const record = { project, location, toolName, serial, status };
+
+  if (editingIndex !== null) {
+    // Replace existing record
+    tblog_inventoryRecords[editingIndex] = record;
+    editingIndex = null; // reset
+  } else {
+    // Add new record
+    tblog_inventoryRecords.push(record);
+  }
+
+  localStorage.setItem("tb_inventoryRecords", JSON.stringify(tblog_inventoryRecords));
+
+  alert("Tool inventory saved!");
+
+  // Reset form
+  document.getElementById("tblog_toolSerial").value = "";
+  document.getElementById("tblog_toolStatus").value = "";
+  document.getElementById("tblog_toolStatus").disabled = false;
+
+  // Show inventory table
+  document.getElementById("tblog_toolInventoryTableWrapper").style.display = "block";
+  tblog_renderInventoryTable();
+
+  // ✅ Refresh Current Tools list
+  tblog_renderAvailableTools();
+
+  // Hide form after saving
+  document.getElementById("tblog_toolInventoryFormWrapper").style.display = "none";
+  document.querySelector(".project-location-container").style.display = "none";
+}
+
+// Render encoded tools in Current Tools container
+function tblog_renderEncodedTools() {
+  const list = document.getElementById("tblog_encodedToolsList");
+  list.innerHTML = "";
+
+  if(tblog_tools.length === 0){
+    const li = document.createElement("li");
+    li.textContent = "No encoded tools yet.";
+    li.style.color = "#888";
+    li.style.textAlign = "center";
+    list.appendChild(li);
+    return;
+  }
+
+  tblog_tools.forEach((tool, index) => {
+    const li = document.createElement("li");
+    li.style.display = "flex";
+    li.style.justifyContent = "space-between";
+    li.style.alignItems = "center";
+    li.style.padding = "8px 12px";
+    li.style.marginBottom = "8px";
+    li.style.background = "#f8f9fa";
+    li.style.borderRadius = "6px";
+    li.style.color = "#2c3e50";
+
+    li.innerHTML = `
+      <span>${tool.name}</span>
+      <button class="delete-tool-btn" onclick="tblog_deleteEncodedTool(${index})">Delete</button>
+    `;
+    list.appendChild(li);
+  });
+}
+
+// Delete tool from encoded tools list
+function tblog_deleteEncodedTool(index) {
+  if (!confirm("Are you sure you want to delete this tool?")) return;
+  tblog_tools.splice(index, 1);
+  saveTools();                 
+  tblog_renderEncodedTools();  
+  tblog_updateToolInventoryDropdown(); 
+}
+
+
+
+
+// Render Inventory Table
+function tblog_renderInventoryTable(projectFilter = null, locationFilter = null) {
+  const tbody = document.querySelector("#tblog_toolInventoryTable tbody");
+  tbody.innerHTML = "";
+
+  tblog_inventoryRecords.forEach((rec, index) => {
+    if (projectFilter && rec.project !== projectFilter) return;
+    if (locationFilter && rec.location !== locationFilter) return;
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td style="padding:8px;border:1px solid #ccc;">${rec.project}</td>
+      <td style="padding:8px;border:1px solid #ccc;">${rec.location}</td>
+      <td style="padding:8px;border:1px solid #ccc;">${rec.toolName}</td>
+      <td style="padding:8px;border:1px solid #ccc;">${rec.serial}</td>
+      <td style="padding:8px;border:1px solid #ccc;">${rec.status}</td>
+      <td style="padding:8px;border:1px solid #ccc;">
+        <button onclick="tblog_editRecord(${index})">Edit</button>
+        <button onclick="tblog_deleteRecord(${index})">Delete</button>
+        <button onclick="tblog_changeStatus(${index})">Change Status</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+
+// Delete Record
+function tblog_deleteRecord(index) {
+  if (!confirm("Are you sure you want to delete this record?")) return;
+  tblog_inventoryRecords.splice(index, 1);
+  localStorage.setItem("tb_inventoryRecords", JSON.stringify(tblog_inventoryRecords));
+  tblog_renderInventoryTable();
+}
+
+let editingIndex = null; // global variable to track edit
+
+// Edit Record (pre-fill form)
+function tblog_editRecord(index) {
+  const rec = tblog_inventoryRecords[index];
+  document.getElementById("tblog_projectDropdown").value = rec.project;
+  document.getElementById("tblog_locDropdown").value = rec.location;
+  document.getElementById("tblog_toolInventoryName").value = rec.toolName;
+  document.getElementById("tblog_toolSerial").value = rec.serial;
+  document.getElementById("tblog_toolStatus").value = rec.status;
+
+  document.getElementById("tblog_toolStatus").disabled = true;
+
+  // ❌ Don't delete yet
+  editingIndex = index; // track which record is being edited
+
+  document.getElementById("tblog_toolInventoryFormWrapper").style.display = "block";
+  document.getElementById("tblog_toolInventoryTableWrapper").style.display = "block";
+}
+
+
+
+let statusChangeIndex = null;
+
+// Change Status
+function tblog_changeStatus(index) {
+  statusChangeIndex = index; // store which record we are editing
+  const record = tblog_inventoryRecords[index];
+  if(!record) return alert("Record not found!");
+  document.getElementById("statusDropdown").value = record.status; // prefill
+  document.getElementById("statusModal").style.display = "flex";
+}
+
+function closeStatusModal() {
+  document.getElementById("statusModal").style.display = "none";
+}
+
+
+// Save status from modal
+window.addEventListener("load", () => {
+  tblog_updateProjectDropdown();
+  tblog_updateLocationDropdown();
+
+  // Only render table if both project & location selected
+  const projectDropdown = document.getElementById("tblog_projectDropdown");
+  const locDropdown = document.getElementById("tblog_locDropdown");
+
+  if(projectDropdown.value && locDropdown.value) {
+    tblog_renderInventoryTable(projectDropdown.value, locDropdown.value);
+    document.getElementById("tblog_toolInventoryTableWrapper").style.display = "block";
+  } else {
+    document.getElementById("tblog_toolInventoryTableWrapper").style.display = "none";
+  }
+
+  // Attach status modal save handler
+  document.getElementById("confirmStatusBtn").onclick = function() {
+    const newStatus = document.getElementById("statusDropdown").value;
+    if (!newStatus) return alert("Please select a status!");
+    if (statusChangeIndex === null || !tblog_inventoryRecords[statusChangeIndex]) {
+      return alert("Error: record not found.");
+    }
+    tblog_inventoryRecords[statusChangeIndex].status = newStatus;
+    localStorage.setItem("tb_inventoryRecords", JSON.stringify(tblog_inventoryRecords));
+    tblog_renderInventoryTable();
+    tblog_renderAvailableTools();
+    closeStatusModal();
+  };
+});
+
+
+  // Update Tool Inventory Dropdown
+function tblog_updateToolInventoryDropdown() {
+  const dropdown = document.getElementById("tblog_toolInventoryName");
+  dropdown.innerHTML = '<option value="">- Select Tool -</option>';
+  tblog_tools.forEach(t => {
+    const opt = document.createElement("option");
+    opt.value = t.name;
+    opt.textContent = t.name;
+    dropdown.appendChild(opt);
+  });
+}
+
+function getAllCurrentTools() {
+  if (tblog_inventoryRecords.length === 0) {
+    console.log("No tools in inventory.");
+    return;
+  }
+
+  console.log("Current Tools Inventory:");
+  tblog_inventoryRecords.forEach(record => {
+    console.log(`Tool: ${record.toolName}, Location: ${record.location}, Status: ${record.status}`);
+  });
+}
+
+// Call the function to see the output
+getAllCurrentTools();
+
+function downloadToolsExcel() {
+  // Get selected project and location from dropdowns
+  const project = document.getElementById("tblog_projectDropdown").value;
+  const location = document.getElementById("tblog_locDropdown").value;
+  const currentDate = new Date().toLocaleDateString(); // mm/dd/yyyy
+
+  if (!project || !location) {
+    return alert("Please select a project and location before downloading.");
+  }
+
+  // Filter data based on selected project and location
+  const filteredData = tblog_inventoryRecords
+    .filter(record => record.project === project && record.location === location)
+    .map(record => ({
+      "Tool Name": record.toolName,
+      "Serial Number": record.serial,
+      "Status": record.status
+    }));
+
+  if (filteredData.length === 0) {
+    return alert("No records found for the selected project and location.");
+  }
+
+  // Create workbook and worksheet
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(filteredData, { origin: 11 }); // headers start at row 12
+
+  // Add 3 empty rows above Project
+  ws['C5'] = { t: 's', v: '' };
+  ws['C6'] = { t: 's', v: '' };
+  ws['C7'] = { t: 's', v: '' };
+
+  // Add static labels in column A (Project, Location, Updated)
+  ws['A8'] = { t: 's', v: 'Project' };
+  ws['A9'] = { t: 's', v: 'Location' };
+  ws['A10'] = { t: 's', v: 'Updated as of' };
+
+  // Add dynamic values in merged cells B8:C8, B9:C9, B10:C10
+  ws['B8'] = { t: 's', v: project };
+  ws['B9'] = { t: 's', v: location };
+  ws['B10'] = { t: 's', v: currentDate };
+
+  // Add title "INVENTORY TOOLS" in top 2 merged rows
+ws['A5'] = { t: 's', v: '' }; // top-left of merge
+ws['B5'] = { t: 's', v: '' };
+ws['C5'] = { t: 's', v: '' };
+ws['A6'] = { t: 's', v: 'INVENTORY TOOLS', s: { alignment: { horizontal: 'center', vertical: 'center' } } 
+}; // second row of merge
+ws['B6'] = { t: 's', v: '' };
+ws['C6'] = { t: 's', v: '' };
+
+  // Merge cells
+  ws['!merges'] = [
+    { s: { r: 5, c: 0 }, e: { r: 6, c: 2 } }, // C5:C6 merged empty rows
+    { s: { r: 7, c: 1 }, e: { r: 7, c: 2 } }, // B8:C8 (Project)
+    { s: { r: 8, c: 1 }, e: { r: 8, c: 2 } }, // B9:C9 (Location)
+    { s: { r: 9, c: 1 }, e: { r: 9, c: 2 } }  // B10:C10 (Updated)
+  ];
+
+  // Set column widths
+  ws['!cols'] = [
+    { wch: 20 }, // Column A
+    { wch: 30 }, // Column B
+    { wch: 30 }  // Column C
+  ];
+
+  // Append sheet and trigger download
+  XLSX.utils.book_append_sheet(wb, ws, "Tools Inventory");
+  XLSX.writeFile(wb, `ToolsInventory_${project}_${location}.xlsx`);
+}
+
+
+
+function updateDownloadButtonVisibility() {
+  const project = document.getElementById("tblog_projectDropdown").value;
+  const location = document.getElementById("tblog_locDropdown").value;
+  const wrapper = document.getElementById("downloadExcelWrapper");
+
+  if (project && location) {
+    wrapper.style.display = "block"; // show button
+  } else {
+    wrapper.style.display = "none";  // hide button
+  }
+}
+
+
+// ---------------- Auth Link Update ----------------
+const authLink=document.getElementById("authLink");
+function updateAuthUI(){
+    const isLoggedIn=localStorage.getItem("isLoggedIn")==="true";
+    if(isLoggedIn){ 
+        authLink.textContent="Logout"; 
+        authLink.onclick=()=>{ if(confirm("Logout?")){localStorage.removeItem("isLoggedIn");window.location.href="../../login.html";} }; 
+    } else { 
+        authLink.textContent="Login"; 
+        authLink.onclick=()=>{window.location.href="../../login.html";}; 
+    }
+}
+
+window.onload = () => {
+  updateAuthUI();
+};
+
+</script>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal">
+  <div class="modal-content">
+    <h3 id="deleteModalTitle">Confirm Deletion</h3>
+    <p id="deleteModalMessage">Are you sure you want to delete this item?</p>
+    <div class="modal-buttons">
+      <button id="confirmDeleteBtn" class="confirm-btn">Yes, Delete</button>
+      <button onclick="closeDeleteModal()" class="cancel-btn">Cancel</button>  
+    </div>
+  </div>
+</div>
+
+<!-- Change Status Modal -->
+<div id="statusModal" class="modal">
+  <div class="modal-content">
+    <h3>Change Tool Status</h3>
+    <div class="form-group">
+      <label for="statusDropdown" style="color: #2c3e50;">Select New Status:</label>
+      <select id="statusDropdown">
+        <option value="">- Select Status -</option>
+        <option value="Good Condition">Good Condition</option>
+        <option value="For Maintenance">For Maintenance</option>
+        <option value="For Repair">For Repair</option>
+      </select>
+    </div>
+    <div class="modal-buttons">
+      <button id="confirmStatusBtn" class="confirm-btn">Save</button>
+      <button onclick="closeStatusModal()" class="cancel-btn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<br>
+<br>
+<footer class="footer">
+  <p>&copy; Kurth Clarenze Lacsinto Novesteras. All rights reserved.</p>
+</footer>
+</body>
+</html>
