@@ -226,6 +226,7 @@
   transition: all 0.3s ease;
   scrollbar-width: thin;
   scrollbar-color: #1abc9c #f2f2f2;
+  
 }
 
 /* For large forms (like Insert Project Data) */
@@ -259,6 +260,13 @@
   position: relative;
 }
 
+.form-popup.insert-modal{
+  text-align: center;
+  align-items: center;
+  justify-items: center;
+}
+
+
 .form-popup h2::after {
   content: "";
   display: block;
@@ -276,20 +284,26 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px 16px;
+  text-align: center;
+  align-items: center;
+  justify-items: center;
 }
 
 .form-grid label {
-  grid-column: span 2;
   font-weight: 600;
   color: #34495e;
   font-size: 13.5px;
   margin-top: 6px;
+  text-align: left; /* Align label text to the left */
+  width: 100%;
+  display: block;
 }
 
 /* Larger screens keep 2-column layout */
 @media (max-width: 600px) {
   .form-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* Stacking items */
+    justify-items: center;  /* Ensure items are still centered */
   }
 }
 
@@ -733,7 +747,7 @@
 
 /* ---------------- UNIFORM TABLE STYLES ---------------- */
 
-#table1, #table2, #table3, #table4, #table5 {
+#table1, #table2, #table3, #table4, #table5, #table6 {
   display: none;
 }
 
@@ -743,7 +757,8 @@
 #table2 table,
 #table3 table,
 #table4 table,
-#table5 table {
+#table5 table,
+#table6 table {
   width: 100%;
   border-collapse: collapse;
   margin: 15px 0;
@@ -765,7 +780,7 @@
 
 /* Table headers */
 #projectsList th,
-#table1 th, #table2 th, #table3 th, #table4 th, #table5 th {
+#table1 th, #table2 th, #table3 th, #table4 th, #table5 th, #table6 th {
   background-color: #2c3e50;
   color: white;
   font-weight: 600;
@@ -775,7 +790,7 @@
 
 /* Table rows */
 #projectsList td,
-#table1 td, #table2 td, #table3 td, #table4 td, #table5 td {
+#table1 td, #table2 td, #table3 td, #table4 td, #table5 td, #table6 td {
   padding: 10px 8px;
   border-bottom: 1px solid #ddd;
   color: #2c3e50;
@@ -787,7 +802,8 @@
 #table2 tr:nth-child(even),
 #table3 tr:nth-child(even),
 #table4 tr:nth-child(even),
-#table5 tr:nth-child(even) {
+#table5 tr:nth-child(even),
+#table6 tr:nth-child(even) {
   background-color: #f9f9f9;
 }
 
@@ -797,7 +813,8 @@
 #table2 tr:hover,
 #table3 tr:hover,
 #table4 tr:hover,
-#table5 tr:hover {
+#table5 tr:hover,
+#table6 tr:hover {
   background-color: #f1f1f1;
 }
 
@@ -807,7 +824,8 @@
 #table2 td button,
 #table3 td button,
 #table4 td button,
-#table5 td button {
+#table5 td button,
+#table6 td button {
   padding: 6px 12px;
   border: none;
   border-radius: 6px;
@@ -822,7 +840,8 @@
 #table2 td .btn-view,
 #table3 td .btn-view,
 #table4 td .btn-view,
-#table5 td .btn-view {
+#table5 td .btn-view,
+#table6 td .btn-view {
   background-color: #2ecc71;
   color: white;
 }
@@ -831,7 +850,8 @@
 #table2 td .btn-view:hover,
 #table3 td .btn-view:hover,
 #table4 td .btn-view:hover,
-#table5 td .btn-view:hover {
+#table5 td .btn-view:hover,
+#table6 td .btn-view:hover {
   background-color: #27ae60;
 }
 
@@ -840,7 +860,8 @@
 #table2 td .btn-delete,
 #table3 td .btn-delete,
 #table4 td .btn-delete,
-#table5 td .btn-delete {
+#table5 td .btn-delete,
+#table6 td .btn-delete {
   background-color: #e74c3c;
   color: white;
 }
@@ -849,21 +870,22 @@
 #table2 td .btn-delete:hover,
 #table3 td .btn-delete:hover,
 #table4 td .btn-delete:hover,
-#table5 td .btn-delete:hover {
+#table5 td .btn-delete:hover,
+#table6 td .btn-delete:hover {
   background-color: #c0392b;
 }
 
 /* Responsive for mobile */
 @media (max-width: 768px) {
   #projectsList, 
-  #table1 table, #table2 table, #table3 table, #table4 table, #table5 table {
+  #table1 table, #table2 table, #table3 table, #table4 table, #table5 table, #table6 table {
     font-size: 12px;
   }
 
   #projectsList th, 
-  #table1 th, #table2 th, #table3 th, #table4 th, #table5 th,
+  #table1 th, #table2 th, #table3 th, #table4 th, #table5 th, #table6 th,
   #projectsList td, 
-  #table1 td, #table2 td, #table3 td, #table4 td, #table5 td {
+  #table1 td, #table2 td, #table3 td, #table4 td, #table5 td, #table6 td {
     padding: 8px 6px;
   }
 
@@ -873,7 +895,8 @@
   #table2 td:last-child,
   #table3 td:last-child,
   #table4 td:last-child,
-  #table5 td:last-child {
+  #table5 td:last-child,
+  #table6 td:last-child {
     flex-direction: column;
     gap: 6px;
   }
@@ -942,7 +965,7 @@
       </div>
 
       <div class="nav-links" id="nav-links">
-        <a href="../../index.html" class="nav-item">Home</a>
+        <a href="../../Index.html" class="nav-item">Home</a>
         <a href="../../AboutUs.html" class="nav-item">About Us</a>
         <a href="../../CompanyProfile.html" class="nav-item">Company Profile</a> <!-- Always accessible -->
         <a href="../../ContactUs.html" class="nav-item">Contact Us</a>
@@ -978,7 +1001,7 @@
   </div>
 </div>
 
-<!-- Insert Data Form -->
+<!-- Insert Data Form 1 -->
 <div id="insertDataModal" class="form-popup insert-modal">
   <h2>Insert Project Data</h2>
  <form id="insertDataForm">
@@ -1017,7 +1040,11 @@
     <input type="number" name="actual_rental" step="any" placeholder="₱ 0.00">
 
     <label>CALENDAR DAYS</label>
-    <input type="number" name="calendar_days" step="any" placeholder="0">
+<div style="display: flex; gap: 10px;">
+  <input type="number" name="calendar_days_min" step="1" placeholder="CURRENT DAY">
+  <span> - </span>
+  <input type="number" name="calendar_days_max" step="1" placeholder="DEADLINE">
+</div>
 
     <label>ACCOMPLISHMENT PERCENTAGE</label>
     <input type="number" name="accomp_percent" step="0.01" placeholder="0%">
@@ -1044,7 +1071,8 @@
     <input type="date" name="project_expiration">
 
     <label>PICTURES (8 MAX)</label>
-    <input type="file" name="pictures" accept="image/*" multiple>
+    <input type="file" name="pictures" accept="image/*" multiple id="picturesInput">
+
   </div>
 
   <div class="form-buttons">
@@ -1052,7 +1080,6 @@
     <button type="button" class="btn-cancel" onclick="closeInsertForm()">✖ Close</button>
   </div>
 </form>
-
 </div>
 
 <!-- Project Details (hidden by default) -->
@@ -1142,9 +1169,11 @@
   <div id="table3"></div>
   <div id="table4"></div>
   <div id="table5"></div>
+  <div id="table6"></div>
 </div>
 
   <script>
+    
 
     const authLink = document.getElementById("authLink");
     const deptDropdown = document.getElementById("deptDropdown");
@@ -1214,9 +1243,14 @@
   // ---- DATA STRUCTURES ----
   let projectsData = JSON.parse(localStorage.getItem("projectsData")) || [];
   let locations = JSON.parse(localStorage.getItem("locations")) || [];
+  
 
   // store project details per project
   let projectDetails = JSON.parse(localStorage.getItem("projectDetails")) || {};
+
+  console.log(localStorage.getItem("projectsData"));
+console.log(localStorage.getItem("locations"));
+console.log(localStorage.getItem("projectDetails"));
 
   let deleteTarget = null; // store what to delete
   let deleteType = "";  
@@ -1228,41 +1262,75 @@
     });
   });
 
-    function saveData() {
-    localStorage.setItem("projectsData", JSON.stringify(projectsData));
-    localStorage.setItem("locations", JSON.stringify(locations));
-  }
+  function saveData() {
+  localStorage.setItem("projectsData", JSON.stringify(projectsData));
+  localStorage.setItem("locations", JSON.stringify(locations));
+  localStorage.setItem("projectDetails", JSON.stringify(projectDetails));  // Save projectDetails
+}
 
-  function addLocation(e) {
+
+function addLocation(e) {
   e.preventDefault();
   const loc = document.getElementById("locationName").value.trim();
   if (!loc) return;
+
   if (!locations.includes(loc)) locations.push(loc);
-  saveAll();
+
+  saveAll(); // Call saveAll after modifying the locations array
+
   document.getElementById("locationName").value = "";
   closeForm("form1");
-  updateDropdowns();
+
+  // Update the dropdowns without reloading the page
+  updateLocationDropdown(); // Update the Add Project dropdown
+  updateDeleteLocationDropdown(); // Update the Delete Location dropdown
 }
 
-  function addProject(e) {
+function addProject(e) {
   e.preventDefault();
+
   const project = document.getElementById("projectName").value.trim();
   const location = document.getElementById("projectLocation").value;
+
   if (!project || !location) return;
 
+  // Check if the project already exists
+  const existingProject = projectsData.find(item => item.location === location && item.project === project);
+  if (existingProject) {
+    alert("This project already exists!");
+    return;
+  }
+
+  // Add new project to the projectsData array
   projectsData.push({ location, project });
 
-  // Initialize projectDetails structure
+  // Initialize projectDetails structure if not already present
   let projectDetails = JSON.parse(localStorage.getItem("projectDetails")) || {};
   if (!projectDetails[location]) projectDetails[location] = {};
   if (!projectDetails[location][project]) projectDetails[location][project] = [];
-  localStorage.setItem("projectDetails", JSON.stringify(projectDetails));
 
+  // Save the updated data
   saveAll();
+
+  // Clear the form and close
   document.getElementById("projectName").value = "";
   closeForm("form2");
+
+  // Clear the content in the tables
+  clearTables();
+
+  // Update the table
   renderTable();
 }
+
+// Function to clear the data from all 5 tables
+function clearTables() {
+  const tableIds = ["table1", "table2", "table3", "table4", "table5" ,"table6"];
+  tableIds.forEach(id => {
+    document.getElementById(id).innerHTML = ""; // Clear table content
+  });
+}
+
 
     function updateLocationDropdown() {
     const dropdown = document.getElementById("projectLocation");
@@ -1273,9 +1341,11 @@
   }
 
 
-  function renderTable() {
+function renderTable() {
   const tbody = document.querySelector("#projectsList tbody");
-  tbody.innerHTML = "";
+  tbody.innerHTML = ""; // Clear the current table content
+
+  // Loop through projectsData to add rows to the table
   projectsData.forEach((item, index) => {
     const row = `
       <tr>
@@ -1375,9 +1445,10 @@ function deleteRow(index) {
 
 
 function saveAll() {
+  // Make sure projectDetails is saved as well
   localStorage.setItem("projectsData", JSON.stringify(projectsData));
   localStorage.setItem("locations", JSON.stringify(locations));
-  localStorage.setItem("projectDetails", JSON.stringify(projectDetails));
+  localStorage.setItem("projectDetails", JSON.stringify(projectDetails));  // Save projectDetails
 }
 
 // ---- OPEN & CLOSE FORM HANDLERS ----
@@ -1502,7 +1573,6 @@ function formatNumber(value) {
   return num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-
 function showProjectStatus(location, project) {
 
   // Hide main project list
@@ -1513,7 +1583,7 @@ function showProjectStatus(location, project) {
   statusContainer.style.display = "block";
 
   // Keep the 5 tables hidden at first
-  const tableIds = ["table1", "table2", "table3", "table4", "table5"];
+  const tableIds = ["table1", "table2", "table3", "table4", "table5", "table6"];
   tableIds.forEach(id => {
     document.getElementById(id).style.display = "none";
   });
@@ -1523,28 +1593,32 @@ function showProjectStatus(location, project) {
     document.getElementById(id).style.display = "block";
   });
 
-  const projectData = projectDetails?.[location]?.[project];
-  const dataList = Array.isArray(projectData) ? projectData : [projectData];
+  // Retrieve projectDetails from localStorage
+  const projectDetails = JSON.parse(localStorage.getItem("projectDetails")) || {};
+  const projectData = projectDetails[location]?.[project];
 
+   // Check if data exists, if not display a message
+  const dataList = Array.isArray(projectData) ? projectData : [projectData];
   if (!dataList || dataList.length === 0) {
     document.getElementById("projectStatusContainer").innerHTML = "<p>No project data available yet.</p>";
     return;
   }
 
   // Clear previous tables
-  for (let i = 1; i <= 5; i++) {
+    for (let i = 1; i <= 5; i++) {
     document.getElementById(`table${i}`).innerHTML = "";
   }
 
   // Table 1
   let table1 = `<table border="1"><tr>
-    <th>Project Name</th><th>Location</th><th>Date</th><th>Sub Contractor</th></tr>`;
+    <th>Project Name</th><th>Location</th><th>Date</th><th>Sub Contractor</th><th>Status</th></tr>`;
   dataList.forEach(item => {
     table1 += `<tr>
       <td>${project}</td>
       <td>${location}</td>
       <td>${item.date || ""}</td>
       <td>${item.subcon || ""}</td>
+      <td>${item.remarks || ""}</td>
     </tr>`;
   });
   table1 += `</table>`;
@@ -1557,7 +1631,7 @@ function showProjectStatus(location, project) {
     table2 += `<tr>
       <td>${item.notice_to_proceed || ""}</td>
       <td>${item.project_expiration || ""}</td>
-      <td>${item.calendar_days || ""}</td>
+       <td>${item.calendar_days_min ? item.calendar_days_min + " - " + item.calendar_days_max : ""}</td>
       <td>${item.accomp_percent || ""}</td>
     </tr>`;
   });
@@ -1684,10 +1758,52 @@ function showProjectStatus(location, project) {
   table5 += `</table>`;
   document.getElementById("table5").innerHTML = table5;
 
+
+// Table 6 (Images)
+let table6 = `<table border="1"><tr>
+    <th>Project Images</th></tr>`;
+
+// Loop through project data and insert remarks into table
+dataList.forEach(item => {
+  table6 += `<tr><td><img src="${item.pictures}" alt="Project Image" style="width:100px;height:auto;"></td></tr>`;
+});
+
+table6 += `</table>`;
+document.getElementById("table6").innerHTML = table6;
+
   // Show container
   document.getElementById("projectStatusContainer").style.display = "block";
 }
 
+
+// Function to disable "Insert Data" button if data already exists
+function disableInsertButtonIfDataExists(location, project) {
+  const projectDetails = JSON.parse(localStorage.getItem("projectDetails")) || {};
+
+  // Check if data already exists for the specific project and location
+  const existingData = projectDetails[location]?.[project] || [];
+  if (existingData.length > 0) {
+    const submitButton = document.querySelector('.btn-submit');
+    submitButton.disabled = true;
+    submitButton.textContent = "Data Already Submitted"; // Change button text
+  }
+}
+
+// Call this function when the page loads to check if data exists for the current project
+document.addEventListener("DOMContentLoaded", () => {
+  const location = localStorage.getItem("currentLocation");
+  const project = localStorage.getItem("currentProject");
+
+  if (location && project) {
+    disableInsertButtonIfDataExists(location, project);
+  }
+});
+
+
+// Call this function when the page loads to check if data exists
+document.addEventListener("DOMContentLoaded", () => {
+  disableInsertButtonIfDataExists();
+});
 
 function insertData(location, project) {
   const form = document.getElementById("insertDataForm");
@@ -1697,32 +1813,54 @@ function insertData(location, project) {
 
     // Collect form data
     const formData = Object.fromEntries(new FormData(form));
-    const key = `${location}_${project}`;
 
     // Get existing data from localStorage
     let projectDetails = JSON.parse(localStorage.getItem("projectDetails")) || {};
-    projectDetails[key] = formData;
 
-    // Save updated data
+    // Ensure the projectDetails structure exists
+    if (!projectDetails[location]) projectDetails[location] = {};
+    if (!projectDetails[location][project]) projectDetails[location][project] = [];
+
+    // Check if data already exists for the specific project and location
+    const existingData = projectDetails[location][project];
+    const dataExists = existingData.some(data => {
+      return (
+        JSON.stringify(data) === JSON.stringify(formData) // Compare the form data with the existing data
+      );
+    });
+
+    if (dataExists) {
+      alert("This data already exists and cannot be inserted again.");
+      return; // Prevent submitting if data already exists
+    }
+
+
+    // Save the updated data to localStorage
     localStorage.setItem("projectDetails", JSON.stringify(projectDetails));
+
+    // Disable the submit button to prevent further submissions
+    const submitButton = document.querySelector('.btn-submit');
+    submitButton.disabled = true;
+    submitButton.textContent = "Data Submitted"; // Change the text to indicate submission
 
     alert("Data saved successfully!");
 
-    // Close modal/form
-    document.getElementById("insertDataModal").style.display = "none";
+    // Close the modal/form
+    closeInsertForm();
 
-    // ✅ Auto-update the project status view if it's currently open
+    // Refresh the project status view if it's currently open
     const projectStatusContainer = document.getElementById("projectStatusContainer");
     if (projectStatusContainer && projectStatusContainer.style.display === "block") {
-      showProjectStatus(location, project);
+      showProjectStatus(location, project); // Refresh project status view
     }
   };
 
-  // show the insert form modal
+  // Show the insert form modal
   document.getElementById("insertDataModal").style.display = "block";
 }
 
 
+// Close the insert data modal
 function closeInsertForm() {
   document.getElementById("insertDataModal").style.display = "none";
 }
@@ -1779,10 +1917,89 @@ document.getElementById("backBtn")?.addEventListener("click", () => {
   document.getElementById("projectStatusContainer").style.display = "none";
   document.getElementById("projectsTable").style.display = "block";
 
-  ["table1", "table2", "table3", "table4", "table5"].forEach(id => {
+  ["table1", "table2", "table3", "table4", "table5", "table6"].forEach(id => {
     document.getElementById(id).style.display = "none";
   });
 });
+
+document.getElementById("insertDataForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+
+const picturesInput = document.getElementById("picturesInput");
+const files = picturesInput.files;
+const picturesArray = [];
+
+if (files.length === 0) {
+  alert("Please select images to upload.");
+  return; // Exit early if no files are selected
+}
+
+let imagesLoaded = 0;
+
+for (let i = 0; i < files.length; i++) {
+  const file = files[i];
+  const reader = new FileReader();
+
+  reader.onload = function (e) {
+    picturesArray.push(e.target.result); // Add the base64 string of the image
+
+    imagesLoaded++;
+
+    // After all images are loaded, update table6
+    if (imagesLoaded === files.length) {
+      updateTable6(picturesArray); // Update the table with the loaded images
+    }
+  };
+
+  reader.readAsDataURL(file); // Convert the image file to base64
+}
+});
+
+// Function to update Table 6 with images (base64 or valid URLs)
+function updateTable6(picturesArray) {
+  let table6 = `<table border="1"><tr>
+    <th>Project Images</th></tr>`;
+
+  // Clear the table before adding new content
+  const tableElement = document.getElementById("table6");
+  tableElement.innerHTML = ""; // Clear previous content
+
+  // Check if the pictures array is empty or has no images
+  if (!picturesArray || picturesArray.length === 0) {
+    table6 += `<tr><td>No images available.</td></tr>`;
+  } else {
+    // Loop through the pictures and add them to the table
+    picturesArray.forEach(image => {
+      table6 += `<tr><td><img src="${image}" alt="Project Image" style="width:100px;height:auto;"></td></tr>`;
+    });
+  }
+
+  table6 += `</table>`;
+  tableElement.innerHTML = table6; // Set new table content
+}
+
+
+function saveProjectData(formData) {
+  const location = localStorage.getItem("currentLocation");
+  const project = localStorage.getItem("currentProject");
+
+  let projectDetails = JSON.parse(localStorage.getItem("projectDetails")) || {};
+  if (!projectDetails[location]) projectDetails[location] = {};
+  if (!projectDetails[location][project]) projectDetails[location][project] = [];
+
+  // Add the formData with the pictures array
+  projectDetails[location][project].push(formData);
+
+  // Save to localStorage
+  localStorage.setItem("projectDetails", JSON.stringify(projectDetails));
+
+  alert("Project data added successfully!");
+  closeInsertForm();
+}
+
+
+
+
 
   </script>
 
@@ -1805,4 +2022,3 @@ document.getElementById("backBtn")?.addEventListener("click", () => {
 
 </body>
 </html>
-
